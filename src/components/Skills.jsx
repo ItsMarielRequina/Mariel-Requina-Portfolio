@@ -7,7 +7,7 @@ const skillGroups = [
   {
     category: "Frameworks & Libraries",
     icon: "🧩",
-    skills: ["Laravel", "React", "Vite", "Tailwind CSS", "Bootstrap", "jQuery"],
+    skills: ["Laravel", "React", "Vite", "Tailwind CSS"],
   },
   {
     category: "Tools & Platforms",
@@ -23,7 +23,9 @@ const skillGroups = [
       "Database Design",
       "Responsive Design",
       "Role-Based Access Control",
-    ],
+      "Artificial Intelligence",
+      "Machine Learning"
+    ]    
   },
 ];
 

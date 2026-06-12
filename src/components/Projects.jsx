@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 const projects = [
   {
@@ -9,7 +9,9 @@ const projects = [
     highlights: ["6 user roles", "Multi-stage workflows", "Excel export", "Document uploads"],
     emoji: "🏛️",
     accent: "#7c3aed",
-    accentSoft: "rgba(124,58,237,0.12)",
+    accentRgb: "124,58,237",
+    tag: "Internship",
+    year: "2026",
     images: [
       "https://placehold.co/800x500/1e1b4b/a78bfa?text=Dashboard",
       "https://placehold.co/800x500/1e1b4b/a78bfa?text=Purchase+Request",
@@ -24,7 +26,9 @@ const projects = [
     highlights: ["Role-based access", "Sales recording", "Inventory tracking", "Brand UI"],
     emoji: "🍗",
     accent: "#6366f1",
-    accentSoft: "rgba(99,102,241,0.12)",
+    accentRgb: "99,102,241",
+    tag: "Freelance",
+    year: "2026",
     images: [
       "https://placehold.co/800x500/1e1b4b/a78bfa?text=POS+Screen",
       "https://placehold.co/800x500/1e1b4b/a78bfa?text=Inventory",
@@ -39,7 +43,9 @@ const projects = [
     highlights: ["Admin & staff roles", "Bcrypt auth", "Live deployment", "Session management"],
     emoji: "📦",
     accent: "#8b5cf6",
-    accentSoft: "rgba(139,92,246,0.12)",
+    accentRgb: "139,92,246",
+    tag: "Project",
+    year: "2025",
     images: [
       "https://placehold.co/800x500/1e1b4b/a78bfa?text=Login",
       "https://placehold.co/800x500/1e1b4b/a78bfa?text=Products",
@@ -54,7 +60,9 @@ const projects = [
     highlights: ["Particle canvas", "Typewriter effect", "Cyberpunk theme", "Devicons"],
     emoji: "🌐",
     accent: "#a78bfa",
-    accentSoft: "rgba(167,139,250,0.12)",
+    accentRgb: "167,139,250",
+    tag: "Personal",
+    year: "2025",
     images: [
       "https://placehold.co/800x500/1e1b4b/a78bfa?text=Hero+Section",
       "https://placehold.co/800x500/1e1b4b/a78bfa?text=Skills+Section",
@@ -63,145 +71,175 @@ const projects = [
   },
 ];
 
+/* ─── Cinematic Modal ─── */
 function ProjectModal({ project, onClose }) {
   const [activeImg, setActiveImg] = useState(0);
+  const [entering, setEntering] = useState(true);
+  const [imgTransition, setImgTransition] = useState(false);
   const overlayRef = useRef(null);
 
   useEffect(() => {
-    const handleKey = (e) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", handleKey);
+    const t = setTimeout(() => setEntering(false), 20);
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
-      window.removeEventListener("keydown", handleKey);
+      clearTimeout(t);
+      window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
   }, [onClose]);
 
-  const handleOverlayClick = (e) => {
-    if (e.target === overlayRef.current) onClose();
+  const switchImg = (idx) => {
+    if (idx === activeImg) return;
+    setImgTransition(true);
+    setTimeout(() => { setActiveImg(idx); setImgTransition(false); }, 220);
   };
 
-  const prev = () => setActiveImg((a) => (a === 0 ? project.images.length - 1 : a - 1));
-  const next = () => setActiveImg((a) => (a === project.images.length - 1 ? 0 : a + 1));
-
-  const overlayStyle = {
-    position: "fixed",
-    inset: 0,
-    zIndex: 100,
-    background: "rgba(2,6,23,0.85)",
-    backdropFilter: "blur(12px)",
-    WebkitBackdropFilter: "blur(12px)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "24px",
-  };
-
-  const modalStyle = {
-    background: "linear-gradient(145deg, #1e293b, #0f172a)",
-    border: "1px solid " + project.accent + "33",
-    boxShadow: "0 0 60px " + project.accentSoft + ", inset 0 1px 0 rgba(255,255,255,0.06)",
-    borderRadius: "24px",
-    width: "100%",
-    maxWidth: "760px",
-    overflow: "hidden",
-  };
-
-  const thumbActiveStyle = {
-    border: "2px solid " + project.accent,
-    opacity: 1,
-  };
-
-  const thumbStyle = {
-    border: "2px solid transparent",
-    opacity: 0.5,
-    cursor: "pointer",
-    borderRadius: "10px",
-    overflow: "hidden",
-    transition: "opacity 0.2s, border-color 0.2s",
-    flex: 1,
-  };
-
-  const arrowStyle = {
-    position: "absolute",
-    top: "50%",
-    transform: "translateY(-50%)",
-    background: "rgba(0,0,0,0.5)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    borderRadius: "10px",
-    width: "36px",
-    height: "36px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    color: "white",
-    transition: "background 0.2s",
-  };
+  const prev = () => switchImg(activeImg === 0 ? project.images.length - 1 : activeImg - 1);
+  const next = () => switchImg(activeImg === project.images.length - 1 ? 0 : activeImg + 1);
 
   return (
-    <div ref={overlayRef} style={overlayStyle} onClick={handleOverlayClick}>
-      <div style={modalStyle}>
-
-        {/* Modal header */}
+    <div
+      ref={overlayRef}
+      onClick={(e) => e.target === overlayRef.current && onClose()}
+      style={{
+        position: "fixed", inset: 0, zIndex: 200,
+        background: "rgba(2,6,23,0.92)",
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "24px",
+        opacity: entering ? 0 : 1,
+        transition: "opacity 0.3s ease",
+      }}
+    >
+      <div
+        style={{
+          width: "100%", maxWidth: "800px",
+          background: "linear-gradient(160deg, #1a1035 0%, #0d0d2b 100%)",
+          border: `1px solid ${project.accent}44`,
+          borderRadius: "28px",
+          overflow: "hidden",
+          boxShadow: `0 0 0 1px ${project.accent}22, 0 40px 80px rgba(0,0,0,0.7), 0 0 60px rgba(${project.accentRgb},0.12)`,
+          transform: entering ? "scale(0.94) translateY(20px)" : "scale(1) translateY(0)",
+          transition: "transform 0.4s cubic-bezier(0.22,1,0.36,1)",
+        }}
+      >
+        {/* Modal top bar */}
         <div
-          className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]"
-          style={{ background: "linear-gradient(135deg, " + project.accent + "22, " + project.accent + "08)" }}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "18px 24px",
+            borderBottom: "1px solid rgba(255,255,255,0.06)",
+            background: `linear-gradient(135deg, rgba(${project.accentRgb},0.15), rgba(${project.accentRgb},0.04))`,
+          }}
         >
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{project.emoji}</span>
-            <h3 className="text-white font-bold text-base">{project.title}</h3>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <span style={{ fontSize: "22px" }}>{project.emoji}</span>
+            <div>
+              <p style={{ color: "#fff", fontWeight: 700, fontSize: "15px", margin: 0 }}>{project.title}</p>
+              <p style={{ color: project.accent, fontSize: "11px", margin: 0, opacity: 0.8 }}>{project.tag} · {project.year}</p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center border border-white/10 bg-white/[0.04] hover:bg-white/10 text-slate-400 hover:text-white transition-all duration-200"
+            style={{
+              width: "32px", height: "32px", borderRadius: "10px",
+              border: "1px solid rgba(255,255,255,0.12)",
+              background: "rgba(255,255,255,0.04)",
+              color: "#94a3b8", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              transition: "background 0.2s, color 0.2s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "#fff"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.04)"; e.currentTarget.style.color = "#94a3b8"; }}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Main image */}
-        <div className="relative bg-slate-950 overflow-hidden" style={{ height: "380px" }}>
+        {/* Image viewer */}
+        <div style={{ position: "relative", height: "360px", background: "#060618", overflow: "hidden" }}>
+          {/* Scan line effect */}
+          <div style={{
+            position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none",
+            backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px)",
+          }} />
           <img
             src={project.images[activeImg]}
-            alt={"Screenshot " + (activeImg + 1)}
-            className="w-full h-full object-cover transition-opacity duration-300"
+            alt={`Screenshot ${activeImg + 1}`}
+            style={{
+              width: "100%", height: "100%", objectFit: "cover",
+              opacity: imgTransition ? 0 : 1,
+              transform: imgTransition ? "scale(1.03)" : "scale(1)",
+              transition: "opacity 0.22s ease, transform 0.22s ease",
+            }}
           />
+          {/* Vignette */}
+          <div style={{
+            position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2,
+            background: `radial-gradient(ellipse at center, transparent 50%, rgba(6,6,24,0.6) 100%)`,
+          }} />
+          {/* Corner accent glow */}
+          <div style={{
+            position: "absolute", bottom: 0, left: 0, right: 0, height: "80px",
+            background: `linear-gradient(to top, rgba(${project.accentRgb},0.08), transparent)`,
+            pointerEvents: "none", zIndex: 2,
+          }} />
 
           {/* Arrows */}
-          <button style={{ ...arrowStyle, left: "12px" }} onClick={prev}>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <button style={{ ...arrowStyle, right: "12px" }} onClick={next}>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          {[{ side: "left", fn: prev, icon: "M15 19l-7-7 7-7" }, { side: "right", fn: next, icon: "M9 5l7 7-7 7" }].map(({ side, fn, icon }) => (
+            <button
+              key={side}
+              onClick={fn}
+              style={{
+                position: "absolute", top: "50%", [side]: "14px",
+                transform: "translateY(-50%)",
+                zIndex: 4, width: "38px", height: "38px", borderRadius: "12px",
+                background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.12)",
+                color: "#fff", cursor: "pointer",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                backdropFilter: "blur(4px)", transition: "background 0.2s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = `rgba(${project.accentRgb},0.4)`}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(0,0,0,0.55)"}
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+              </svg>
+            </button>
+          ))}
 
-          {/* Counter */}
-          <div className="absolute bottom-3 right-4 text-xs text-slate-400 bg-black/50 px-2 py-1 rounded-full">
+          {/* Counter pill */}
+          <div style={{
+            position: "absolute", bottom: "12px", right: "14px", zIndex: 4,
+            background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)",
+            border: `1px solid ${project.accent}44`,
+            borderRadius: "20px", padding: "3px 10px",
+            fontSize: "11px", color: "#94a3b8",
+          }}>
             {activeImg + 1} / {project.images.length}
           </div>
         </div>
 
         {/* Thumbnails */}
-        <div className="flex gap-3 px-6 py-4">
+        <div style={{ display: "flex", gap: "10px", padding: "14px 24px 18px" }}>
           {project.images.map((img, idx) => (
             <div
               key={idx}
-              onClick={() => setActiveImg(idx)}
-              style={idx === activeImg ? { ...thumbStyle, ...thumbActiveStyle } : thumbStyle}
+              onClick={() => switchImg(idx)}
+              style={{
+                flex: 1, borderRadius: "10px", overflow: "hidden", cursor: "pointer",
+                border: `2px solid ${idx === activeImg ? project.accent : "rgba(255,255,255,0.08)"}`,
+                opacity: idx === activeImg ? 1 : 0.45,
+                transition: "border-color 0.2s, opacity 0.2s",
+                transform: idx === activeImg ? "scale(1.04)" : "scale(1)",
+              }}
             >
-              <img
-                src={img}
-                alt={"Thumb " + (idx + 1)}
-                className="w-full object-cover"
-                style={{ height: "60px" }}
-              />
+              <img src={img} alt="" style={{ width: "100%", height: "56px", objectFit: "cover", display: "block" }} />
             </div>
           ))}
         </div>
@@ -211,220 +249,357 @@ function ProjectModal({ project, onClose }) {
   );
 }
 
+/* ─── Magnetic wrapper ─── */
+function MagneticCard({ children, style, className, onMouseEnter, onMouseLeave }) {
+  const ref = useRef(null);
+  const raf = useRef(null);
+
+  const onMove = useCallback((e) => {
+    cancelAnimationFrame(raf.current);
+    raf.current = requestAnimationFrame(() => {
+      const el = ref.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+      const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+      el.style.transform = `perspective(900px) rotateY(${dx * 5}deg) rotateX(${-dy * 3.5}deg) translateY(-6px) scale(1.015)`;
+      el.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
+      el.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
+    });
+  }, []);
+
+  const leave = useCallback((e) => {
+    if (ref.current) ref.current.style.transform = "perspective(900px) rotateY(0deg) rotateX(0deg) translateY(0px) scale(1)";
+    onMouseLeave?.(e);
+  }, [onMouseLeave]);
+
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{ ...style, willChange: "transform", transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)" }}
+      onMouseMove={onMove}
+      onMouseLeave={leave}
+      onMouseEnter={onMouseEnter}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ─── Project card ─── */
 function ProjectCard({ project, i, onPreview }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [btnHover, setBtnHover] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
-      { threshold: 0.1 }
+      ([e]) => { if (e.isIntersecting) setVisible(true); },
+      { threshold: 0.08 }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
-  const delay = (i * 0.12) + "s";
-
-  const getTransform = () => {
-    if (!visible) return "translateY(40px)";
-    if (hovered) return "translateY(-6px)";
-    return "translateY(0)";
-  };
-
-  const getBoxShadow = () => {
-    if (hovered) {
-      return "4px 4px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 40px " + project.accentSoft;
-    }
-    return "4px 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)";
-  };
-
-  const wrapperStyle = {
-    background: "linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))",
-    boxShadow: getBoxShadow(),
-    borderColor: hovered ? project.accent + "55" : "rgba(255,255,255,0.1)",
-    transitionProperty: "opacity, transform, box-shadow, border-color",
-    transitionDuration: "0.6s, 0.6s, 0.3s, 0.3s",
-    transitionTimingFunction: "ease",
-    transitionDelay: delay + ", " + delay + ", 0s, 0s",
-    opacity: visible ? 1 : 0,
-    transform: getTransform(),
-  };
-
-  const headerStyle = {
-    background: "linear-gradient(135deg, " + project.accent + "22, " + project.accent + "08)",
-  };
-
-  const emojiBoxStyle = {
-    background: "linear-gradient(145deg, " + project.accent + "33, " + project.accent + "11)",
-    border: "1px solid " + project.accent + "33",
-    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
-  };
-
-  const glowOverlayStyle = {
-    background: "radial-gradient(ellipse at top left, " + project.accentSoft + ", transparent 70%)",
-    opacity: hovered ? 1 : 0,
-  };
-
-  const highlightStyle = {
-    color: project.accent,
-    background: project.accentSoft,
-    borderColor: project.accent + "33",
-  };
-
-  const previewBtnStyle = {
-    background: project.accentSoft,
-    border: "1px solid " + project.accent + "44",
-    color: project.accent,
-    borderRadius: "12px",
-    padding: "8px 16px",
-    fontSize: "13px",
-    fontWeight: 600,
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    transition: "background 0.2s, border-color 0.2s",
-    marginTop: "4px",
-    width: "100%",
-    justifyContent: "center",
-  };
+  const delay = i * 0.13;
 
   return (
     <div
       ref={ref}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="relative overflow-hidden rounded-3xl border backdrop-blur-xl flex flex-col"
-      style={wrapperStyle}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(50px)",
+        transition: `opacity 0.8s ease ${delay}s, transform 0.8s cubic-bezier(0.22,1,0.36,1) ${delay}s`,
+      }}
     >
-      {/* Hover glow overlay */}
-      <div
-        className="absolute inset-0 transition-opacity duration-500 pointer-events-none"
-        style={glowOverlayStyle}
-      />
-
-      {/* Card header */}
-      <div
-        className="relative flex items-center justify-between px-7 py-6 border-b border-white/[0.06]"
-        style={headerStyle}
+      <MagneticCard
+        className="relative overflow-hidden rounded-3xl border flex flex-col h-full"
+        style={{
+          background: "linear-gradient(155deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 100%)",
+          borderColor: hovered ? `${project.accent}55` : "rgba(255,255,255,0.09)",
+          boxShadow: hovered
+            ? `0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 50px rgba(${project.accentRgb},0.14)`
+            : "0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
+          transition: "border-color 0.3s, box-shadow 0.3s",
+        }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
-        <div className="flex items-center gap-4">
+        {/* Mouse-tracking radial spotlight */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-3xl z-0"
+          style={{
+            background: `radial-gradient(340px circle at var(--mx,50%) var(--my,30%), rgba(${project.accentRgb},0.11), transparent 65%)`,
+            opacity: hovered ? 1 : 0,
+            transition: "opacity 0.4s ease",
+          }}
+        />
+
+        {/* Top shimmer line */}
+        <div
+          className="absolute top-0 left-0 right-0 h-px z-10"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${project.accent}bb, transparent)`,
+            opacity: hovered ? 1 : 0.4,
+            transition: "opacity 0.3s",
+          }}
+        />
+
+        {/* Header */}
+        <div
+          className="relative flex items-center gap-4 px-7 py-6 border-b border-white/[0.06]"
+          style={{
+            background: `linear-gradient(135deg, rgba(${project.accentRgb},0.14) 0%, rgba(${project.accentRgb},0.04) 100%)`,
+          }}
+        >
+          {/* Emoji box with inner glow */}
           <div
             className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
-            style={emojiBoxStyle}
+            style={{
+              background: `linear-gradient(145deg, rgba(${project.accentRgb},0.25), rgba(${project.accentRgb},0.08))`,
+              border: `1px solid rgba(${project.accentRgb},0.3)`,
+              boxShadow: hovered ? `0 0 20px rgba(${project.accentRgb},0.3)` : "none",
+              transition: "box-shadow 0.3s",
+              filter: hovered ? "drop-shadow(0 0 8px " + project.accent + "88)" : "none",
+            }}
           >
             {project.emoji}
           </div>
-          <h3 className="text-base font-bold text-white leading-snug">{project.title}</h3>
+
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-bold text-white leading-snug">{project.title}</h3>
+            <p className="text-xs mt-0.5 font-medium" style={{ color: `${project.accent}cc` }}>
+              {project.tag} · {project.year}
+            </p>
+          </div>
+
+          {/* Animated corner badge */}
+          <div
+            className="absolute top-4 right-4 w-2 h-2 rounded-full"
+            style={{
+              background: project.accent,
+              boxShadow: `0 0 8px ${project.accent}`,
+              animation: "pulse-dot 2s ease-in-out infinite",
+            }}
+          />
         </div>
-      </div>
 
-      {/* Card body */}
-      <div className="relative z-10 flex flex-col flex-1 px-7 py-6 gap-5">
+        {/* Body */}
+        <div className="relative z-10 flex flex-col flex-1 px-7 py-6 gap-5">
 
-        <p className="text-slate-400 text-sm leading-relaxed">{project.description}</p>
+          <p className="text-slate-400 text-sm leading-relaxed">{project.description}</p>
 
-        <div className="flex flex-wrap gap-2">
-          {project.highlights.map((h) => (
-            <span
-              key={h}
-              className="flex items-center gap-1 text-xs font-medium px-3 py-1 rounded-full border transition-all duration-200"
-              style={highlightStyle}
+          {/* Highlight chips with check icons */}
+          <div className="flex flex-wrap gap-2">
+            {project.highlights.map((h, j) => (
+              <span
+                key={h}
+                className="flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border"
+                style={{
+                  color: project.accent,
+                  background: `rgba(${project.accentRgb},0.08)`,
+                  borderColor: `rgba(${project.accentRgb},0.25)`,
+                  opacity: visible ? 1 : 0,
+                  transform: visible ? "scale(1)" : "scale(0.85)",
+                  transition: `opacity 0.4s ease ${delay + 0.2 + j * 0.05}s, transform 0.4s ease ${delay + 0.2 + j * 0.05}s`,
+                }}
+              >
+                <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+                {h}
+              </span>
+            ))}
+          </div>
+
+          <div className="h-px" style={{ background: "rgba(255,255,255,0.06)" }} />
+
+          {/* Stack tags */}
+          <div className="flex flex-wrap gap-2">
+            {project.stack.map((s, j) => (
+              <span
+                key={s}
+                className="text-xs font-medium px-3 py-1 rounded-full border border-white/10 text-slate-300 transition-all duration-300 cursor-default"
+                style={{
+                  background: "rgba(255,255,255,0.03)",
+                  opacity: visible ? 1 : 0,
+                  transition: `opacity 0.4s ease ${delay + 0.35 + j * 0.04}s, background 0.2s, border-color 0.2s, color 0.2s`,
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = `rgba(${project.accentRgb},0.12)`;
+                  e.currentTarget.style.borderColor = `rgba(${project.accentRgb},0.4)`;
+                  e.currentTarget.style.color = "#fff";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+                  e.currentTarget.style.color = "rgb(203,213,225)";
+                }}
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+
+          {/* View screenshots CTA */}
+          <button
+            onClick={() => onPreview(project)}
+            onMouseEnter={() => setBtnHover(true)}
+            onMouseLeave={() => setBtnHover(false)}
+            style={{
+              marginTop: "auto",
+              padding: "10px 0",
+              width: "100%",
+              borderRadius: "14px",
+              border: `1px solid ${btnHover ? project.accent + "88" : `rgba(${project.accentRgb},0.25)`}`,
+              background: btnHover ? `rgba(${project.accentRgb},0.18)` : `rgba(${project.accentRgb},0.07)`,
+              color: project.accent,
+              fontSize: "13px",
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "7px",
+              transition: "background 0.25s, border-color 0.25s, transform 0.15s",
+              transform: btnHover ? "scale(1.01)" : "scale(1)",
+              boxShadow: btnHover ? `0 0 20px rgba(${project.accentRgb},0.2)` : "none",
+            }}
+          >
+            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.069A1 1 0 0121 8.87V15.13a1 1 0 01-1.447.9L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+            </svg>
+            View Screenshots
+            <svg
+              width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              style={{ opacity: btnHover ? 1 : 0, transform: btnHover ? "translateX(0)" : "translateX(-4px)", transition: "opacity 0.2s, transform 0.2s" }}
             >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-              </svg>
-              {h}
-            </span>
-          ))}
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
         </div>
-
-        <div className="h-px bg-white/[0.06]" />
-
-        <div className="flex flex-wrap gap-2">
-          {project.stack.map((s) => (
-            <span
-              key={s}
-              className="text-xs font-medium px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-slate-300 hover:border-violet-500/40 hover:bg-violet-500/10 hover:text-white transition-all duration-300"
-            >
-              {s}
-            </span>
-          ))}
-        </div>
-
-        {/* Preview button */}
-        <button style={previewBtnStyle} onClick={() => onPreview(project)}>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.069A1 1 0 0121 8.87V15.13a1 1 0 01-1.447.9L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
-          </svg>
-          View Screenshots
-        </button>
-
-      </div>
+      </MagneticCard>
     </div>
   );
 }
 
-export default function Projects() {
-  const headerRef = useRef(null);
-  const [headerVisible, setHeaderVisible] = useState(false);
-  const [activeProject, setActiveProject] = useState(null);
-
+/* ─── Floating particles canvas ─── */
+function Particles() {
+  const ref = useRef(null);
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setHeaderVisible(true); },
-      { threshold: 0.3 }
-    );
-    if (headerRef.current) observer.observe(headerRef.current);
-    return () => observer.disconnect();
+    const c = ref.current;
+    if (!c) return;
+    const ctx = c.getContext("2d");
+    c.width = c.offsetWidth; c.height = c.offsetHeight;
+    const pts = Array.from({ length: 32 }, () => ({
+      x: Math.random() * c.width, y: Math.random() * c.height,
+      r: Math.random() * 1.3 + 0.3,
+      dx: (Math.random() - 0.5) * 0.2, dy: (Math.random() - 0.5) * 0.2,
+      a: Math.random() * 0.35 + 0.08,
+    }));
+    let raf;
+    const loop = () => {
+      ctx.clearRect(0, 0, c.width, c.height);
+      pts.forEach(p => {
+        p.x += p.dx; p.y += p.dy;
+        if (p.x < 0) p.x = c.width; if (p.x > c.width) p.x = 0;
+        if (p.y < 0) p.y = c.height; if (p.y > c.height) p.y = 0;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(139,92,246,${p.a})`;
+        ctx.fill();
+      });
+      raf = requestAnimationFrame(loop);
+    };
+    loop();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={ref} className="absolute inset-0 w-full h-full pointer-events-none" style={{ opacity: 0.5 }} />;
+}
+
+/* ─── Section header ─── */
+function SectionHeader() {
+  const ref = useRef(null);
+  const [v, setV] = useState(false);
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setV(true); }, { threshold: 0.3 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
   }, []);
 
-  const headerStyle = {
-    transition: "opacity 0.7s ease, transform 0.7s ease",
-    opacity: headerVisible ? 1 : 0,
-    transform: headerVisible ? "translateY(0)" : "translateY(30px)",
-  };
+  return (
+    <div ref={ref} className="text-center mb-20">
+      <p style={{ opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.1s" }}
+        className="uppercase tracking-[0.35em] text-violet-400 text-xs font-semibold mb-3">
+        What I've Built
+      </p>
+      <div className="overflow-hidden">
+        <h2
+          className="text-4xl md:text-5xl font-black text-white"
+          style={{
+            opacity: v ? 1 : 0,
+            transform: v ? "translateY(0)" : "translateY(50px)",
+            transition: "opacity 0.7s ease 0.2s, transform 0.7s cubic-bezier(0.22,1,0.36,1) 0.2s",
+          }}
+        >
+          Projects
+        </h2>
+      </div>
+
+      <div className="flex justify-center my-4">
+        <div style={{
+          height: "1px",
+          background: "linear-gradient(90deg, transparent, #7c3aed, #a78bfa, #7c3aed, transparent)",
+          width: v ? "200px" : "0px",
+          transition: "width 1.1s cubic-bezier(0.22,1,0.36,1) 0.4s",
+        }} />
+      </div>
+
+      <p style={{ opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.5s" }}
+        className="max-w-xl mx-auto text-slate-400 text-sm">
+        A selection of real-world systems and apps I've designed and developed from scratch.
+      </p>
+    </div>
+  );
+}
+
+/* ─── Main export ─── */
+export default function Projects() {
+  const [activeProject, setActiveProject] = useState(null);
 
   return (
-    <section id="projects" className="relative py-28 bg-slate-950 overflow-hidden">
+    <>
+      <style>{`
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(1.5); }
+        }
+      `}</style>
 
-      {/* Background Glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 right-0 w-[450px] h-[450px] bg-violet-700/10 blur-[140px]" />
-        <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-blue-600/10 blur-[140px]" />
-      </div>
-
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
-
-        {/* Header */}
-        <div ref={headerRef} className="text-center mb-20" style={headerStyle}>
-          <p className="uppercase tracking-[0.3em] text-violet-400 text-sm mb-3">
-            What I've Built
-          </p>
-          <h2 className="text-4xl md:text-5xl font-black text-white">
-            Projects
-          </h2>
-          <p className="mt-4 max-w-xl mx-auto text-slate-400">
-            A selection of real-world systems and apps I've designed and developed from scratch.
-          </p>
+      <section id="projects" className="relative py-28 bg-slate-950 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-1/4 w-[550px] h-[550px] bg-violet-800/8 blur-[180px]" />
+          <div className="absolute bottom-0 left-1/4 w-[550px] h-[550px] bg-blue-700/8 blur-[180px]" />
         </div>
 
-        {/* Grid */}
-        <div className="grid md:grid-cols-2 gap-8">
-          {projects.map((project, i) => (
-            <ProjectCard key={i} project={project} i={i} onPreview={setActiveProject} />
-          ))}
+        <Particles />
+
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          <SectionHeader />
+          <div className="grid md:grid-cols-2 gap-8">
+            {projects.map((project, i) => (
+              <ProjectCard key={i} project={project} i={i} onPreview={setActiveProject} />
+            ))}
+          </div>
         </div>
+      </section>
 
-      </div>
-
-      {/* Modal */}
       {activeProject && (
         <ProjectModal project={activeProject} onClose={() => setActiveProject(null)} />
       )}
-
-    </section>
+    </>
   );
 }

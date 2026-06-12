@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 const experiences = [
   {
-    role: "Web Developer (Contract)",
+    role: "Full Stack Developer",
     company: "DSWD – Department of Social Welfare and Development",
     location: "Philippines",
-    period: "2024 – Present",
-    type: "Contract",
+    period: "Feb 2026 – Jun 2026",
+    type: "Internship",
     description:
       "Built and maintained a Laravel-based Purchase Request Tracking System (PTS) for the Procurement Division.",
     bullets: [
@@ -17,15 +17,22 @@ const experiences = [
       "Managed ENUM migrations, route naming conventions, and Excel export logic via OpenSpout",
     ],
     stack: ["Laravel", "PHP", "MySQL", "Blade", "Bootstrap", "OpenSpout"],
+    accent: "#7c3aed",
+    accentGlow: "rgba(124,58,237,0.18)",
+    accentSoft: "rgba(124,58,237,0.08)",
+    typeColor: "text-violet-300",
+    typeBg: "bg-violet-500/10",
+    typeBorder: "border-violet-500/20",
+    number: "01",
   },
   {
-    role: "Freelance Web Developer",
+    role: "Full Stack Developer",
     company: "Sisters Chick'n Love (Food Business)",
     location: "Davao City, Philippines",
-    period: "2024",
+    period: "2026",
     type: "Freelance",
     description:
-      "Developed a full-stack POS and Inventory Management System for a food business.",
+      "Developed a full-stack Sales and Inventory Management System for a food business.",
     bullets: [
       "Built role-based admin and staff flows with React + Vite",
       "Implemented sales recording and daily inventory tracking",
@@ -33,196 +40,462 @@ const experiences = [
       "Integrated product management, reporting dashboards, and low-stock alerts",
     ],
     stack: ["React", "Vite", "Tailwind CSS", "JavaScript"],
-  },
-  {
-    role: "Full-Stack Developer",
-    company: "Inventory Tracking System (XAMPP/InfinityFree)",
-    location: "Personal Project",
-    period: "2023",
-    type: "Project",
-    description:
-      "Built a PHP/MySQL inventory system with admin and staff roles for small business use.",
-    bullets: [
-      "Session-based authentication with bcrypt password hashing",
-      "Admin and staff role separation with different dashboard views",
-      "Product tracking, stock management, and user management modules",
-      "Deployed on InfinityFree for live testing",
-    ],
-    stack: ["PHP", "MySQL", "Bootstrap", "XAMPP"],
+    accent: "#2563eb",
+    accentGlow: "rgba(37,99,235,0.18)",
+    accentSoft: "rgba(37,99,235,0.08)",
+    typeColor: "text-blue-300",
+    typeBg: "bg-blue-500/10",
+    typeBorder: "border-blue-500/20",
+    number: "02",
   },
 ];
 
-const typeBadge = {
-  Contract: "text-violet-300 bg-violet-500/10 border-violet-500/20",
-  Freelance: "text-blue-300 bg-blue-500/10 border-blue-500/20",
-  Project: "text-indigo-300 bg-indigo-500/10 border-indigo-500/20",
-};
+/* ─── Animated counter for stats ─── */
+function Counter({ to, suffix = "" }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef(null);
+  const started = useRef(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !started.current) {
+        started.current = true;
+        let start = 0;
+        const step = Math.ceil(to / 30);
+        const id = setInterval(() => {
+          start = Math.min(start + step, to);
+          setVal(start);
+          if (start >= to) clearInterval(id);
+        }, 40);
+      }
+    }, { threshold: 0.5 });
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [to]);
+  return <span ref={ref}>{val}{suffix}</span>;
+}
 
-const typeGlow = {
-  Contract: "group-hover:from-violet-500/5",
-  Freelance: "group-hover:from-blue-500/5",
-  Project: "group-hover:from-indigo-500/5",
-};
+/* ─── Typewriter line ─── */
+function TypeLine({ text, delay, accent }) {
+  const [chars, setChars] = useState(0);
+  const ref = useRef(null);
+  const started = useRef(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !started.current) {
+        started.current = true;
+        const t = setTimeout(() => {
+          let i = 0;
+          const id = setInterval(() => {
+            i++;
+            setChars(i);
+            if (i >= text.length) clearInterval(id);
+          }, 22);
+        }, delay);
+        return () => clearTimeout(t);
+      }
+    }, { threshold: 0.3 });
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [text, delay]);
 
-const cardBase = {
-  background: "linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))",
-  boxShadow: "4px 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
-};
+  const done = chars >= text.length;
+  return (
+    <span ref={ref} className="flex items-start gap-3 text-sm text-slate-300 leading-relaxed">
+      <span
+        className="mt-[6px] w-1.5 h-1.5 rounded-full flex-shrink-0 transition-all duration-500"
+        style={{
+          background: chars > 0 ? accent : "rgba(255,255,255,0.15)",
+          boxShadow: chars > 0 ? `0 0 8px ${accent}` : "none",
+        }}
+      />
+      <span>
+        {text.slice(0, chars)}
+        {!done && (
+          <span
+            className="inline-block w-[2px] h-3 align-middle ml-[1px]"
+            style={{ background: accent, animation: "blink .6s step-end infinite" }}
+          />
+        )}
+      </span>
+    </span>
+  );
+}
 
+/* ─── Stack badge with hover glow ─── */
+function StackBadge({ label, accent, visible, delay }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <span
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="text-xs font-medium px-3 py-1 rounded-full border cursor-default select-none transition-all duration-300"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0) scale(1)" : "translateY(8px) scale(0.92)",
+        transition: `opacity 0.4s ease ${delay}s, transform 0.4s cubic-bezier(0.22,1,0.36,1) ${delay}s, background 0.2s, border-color 0.2s, box-shadow 0.2s`,
+        background: hovered ? `${accent}22` : "rgba(255,255,255,0.03)",
+        borderColor: hovered ? `${accent}66` : "rgba(255,255,255,0.1)",
+        color: hovered ? "#fff" : "rgb(203,213,225)",
+        boxShadow: hovered ? `0 0 12px ${accent}44` : "none",
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
+/* ─── Magnetic tilt wrapper ─── */
+function MagneticCard({ children, style, className }) {
+  const ref = useRef(null);
+  const raf = useRef(null);
+
+  const onMove = useCallback((e) => {
+    if (raf.current) cancelAnimationFrame(raf.current);
+    raf.current = requestAnimationFrame(() => {
+      const el = ref.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const dx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+      const dy = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+      el.style.transform = `perspective(1000px) rotateY(${dx * 5}deg) rotateX(${-dy * 3}deg) scale(1.015)`;
+      el.style.setProperty("--mx", `${((e.clientX - r.left) / r.width) * 100}%`);
+      el.style.setProperty("--my", `${((e.clientY - r.top) / r.height) * 100}%`);
+    });
+  }, []);
+
+  const onLeave = useCallback(() => {
+    if (ref.current)
+      ref.current.style.transform =
+        "perspective(1000px) rotateY(0deg) rotateX(0deg) scale(1)";
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{ ...style, willChange: "transform", transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)" }}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ─── Single experience card ─── */
 function ExpCard({ exp, i }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
-      { threshold: 0.1 }
+      ([e]) => { if (e.isIntersecting) setVisible(true); },
+      { threshold: 0.08 }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
+  const isEven = i % 2 === 0;
+
   return (
     <div
       ref={ref}
-      className="group relative overflow-hidden rounded-3xl border border-white/10 backdrop-blur-xl p-8 hover:border-violet-500/40 transition-all duration-300"
+      className="relative"
       style={{
-        ...cardBase,
-        transition: "opacity 0.6s ease " + (i * 0.15) + "s, transform 0.6s ease " + (i * 0.15) + "s, border-color 0.3s",
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(40px)",
+        transform: visible ? "translateY(0)" : `translateY(60px)`,
+        transition: `opacity 0.9s ease ${i * 0.2}s, transform 0.9s cubic-bezier(0.22,1,0.36,1) ${i * 0.2}s`,
       }}
     >
-      {/* Hover glow */}
-      <div
-        className={
-          "absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-gradient-to-br via-transparent to-blue-500/5 " +
-          typeGlow[exp.type]
-        }
-      />
+      <MagneticCard
+        className="group relative overflow-hidden rounded-3xl border border-white/[0.08] backdrop-blur-xl"
+        style={{
+          background: "linear-gradient(160deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.015) 100%)",
+          boxShadow: `0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07)`,
+        }}
+      >
+        {/* Radial mouse spotlight */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl z-0"
+          style={{
+            background: `radial-gradient(380px circle at var(--mx,50%) var(--my,50%), ${exp.accentGlow}, transparent 65%)`,
+          }}
+        />
 
-      <div className="relative z-10">
+        {/* Top accent bar */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[2px] z-10"
+          style={{
+            background: `linear-gradient(90deg, transparent 0%, ${exp.accent} 40%, ${exp.accent} 60%, transparent 100%)`,
+            opacity: visible ? 1 : 0,
+            transition: `opacity 0.5s ease ${i * 0.2 + 0.5}s`,
+          }}
+        />
 
-        {/* Top row */}
-        <div className="flex flex-wrap items-start justify-between gap-4 mb-5">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-xl font-bold text-white mb-1">{exp.role}</h3>
-            <p className="text-violet-400 font-semibold text-sm mb-1">{exp.company}</p>
-            <p className="text-slate-500 text-xs flex items-center gap-1">
-              <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              {exp.location}
-            </p>
+        <div className="relative z-10 p-8 md:p-10">
+
+          {/* Large ghost number */}
+          <div
+            className="absolute top-6 right-8 text-[7rem] font-black leading-none select-none pointer-events-none"
+            style={{
+              color: exp.accent,
+              opacity: 0.04,
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {exp.number}
           </div>
 
-          <div className="flex flex-col items-end gap-2 flex-shrink-0">
-            <span className="text-xs font-semibold text-slate-400 bg-white/[0.04] border border-white/10 px-3 py-1 rounded-full">
-              {exp.period}
-            </span>
-            <span
-              className={
-                "text-xs font-semibold px-3 py-1 rounded-full border " +
-                typeBadge[exp.type]
-              }
-            >
-              {exp.type}
-            </span>
-          </div>
-        </div>
+          {/* ── Header row ── */}
+          <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
+            <div className="flex-1 min-w-0">
+              {/* Role with animated underline */}
+              <div className="relative inline-block mb-1">
+                <h3 className="text-2xl font-black text-white tracking-tight leading-none">
+                  {exp.role}
+                </h3>
+                <span
+                  className="absolute -bottom-0.5 left-0 h-px"
+                  style={{
+                    background: `linear-gradient(90deg, ${exp.accent}, transparent)`,
+                    width: visible ? "100%" : "0%",
+                    transition: `width 0.9s ease ${i * 0.2 + 0.4}s`,
+                  }}
+                />
+              </div>
 
-        {/* Divider */}
-        <div className="h-px bg-white/[0.06] mb-5" />
+              {/* Company */}
+              <p
+                className="font-semibold text-sm mt-2 mb-1"
+                style={{ color: exp.accent }}
+              >
+                {exp.company}
+              </p>
 
-        {/* Description */}
-        <p className="text-slate-400 text-sm leading-relaxed mb-5">
-          {exp.description}
-        </p>
+              {/* Location */}
+              <p className="text-slate-500 text-xs flex items-center gap-1">
+                <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {exp.location}
+              </p>
+            </div>
 
-        {/* Bullets */}
-        <ul className="space-y-2 mb-6">
-          {exp.bullets.map((b, j) => (
-            <li key={j} className="flex items-start gap-3 text-sm text-slate-400">
+            {/* Badges */}
+            <div className="flex flex-col items-end gap-2 flex-shrink-0">
+              <span className="text-xs font-semibold text-slate-400 bg-white/[0.04] border border-white/10 px-3 py-1.5 rounded-full">
+                {exp.period}
+              </span>
               <span
-                className="mt-1.5 w-1.5 h-1.5 rounded-full bg-violet-500 flex-shrink-0"
-                style={{ boxShadow: "0 0 6px rgba(139,92,246,0.6)" }}
+                className={`text-xs font-bold px-3 py-1.5 rounded-full border tracking-wide ${exp.typeColor} ${exp.typeBg} ${exp.typeBorder}`}
+              >
+                {exp.type}
+              </span>
+            </div>
+          </div>
+
+          {/* ── Divider with glow ── */}
+          <div className="relative h-px mb-6">
+            <div className="absolute inset-0 bg-white/[0.05]" />
+            <div
+              className="absolute inset-0 h-px"
+              style={{
+                background: `linear-gradient(90deg, ${exp.accent}44, transparent)`,
+                width: visible ? "60%" : "0%",
+                transition: `width 1s ease ${i * 0.2 + 0.5}s`,
+              }}
+            />
+          </div>
+
+          {/* ── Description ── */}
+          <p
+            className="text-slate-400 text-sm leading-relaxed mb-6"
+            style={{
+              opacity: visible ? 1 : 0,
+              transform: visible ? "none" : "translateY(8px)",
+              transition: `opacity 0.6s ease ${i * 0.2 + 0.35}s, transform 0.6s ease ${i * 0.2 + 0.35}s`,
+            }}
+          >
+            {exp.description}
+          </p>
+
+          {/* ── Terminal-style bullet list ── */}
+          <div
+            className="rounded-2xl border border-white/[0.06] mb-6 overflow-hidden"
+            style={{ background: "rgba(0,0,0,0.25)" }}
+          >
+            {/* Terminal header bar */}
+            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.05]">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+              <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+              <span className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+              <span
+                className="ml-3 text-xs font-mono"
+                style={{ color: `${exp.accent}99` }}
+              >
+                {exp.type.toLowerCase()}.log
+              </span>
+            </div>
+            {/* Lines */}
+            <div className="px-5 py-4 space-y-3 font-mono">
+              {exp.bullets.map((b, j) => (
+                <TypeLine
+                  key={j}
+                  text={b}
+                  delay={visible ? i * 200 + j * 130 + 500 : 99999}
+                  accent={exp.accent}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* ── Stack badges ── */}
+          <div className="flex flex-wrap gap-2">
+            {exp.stack.map((s, j) => (
+              <StackBadge
+                key={s}
+                label={s}
+                accent={exp.accent}
+                visible={visible}
+                delay={i * 0.2 + j * 0.06 + 0.5}
               />
-              {b}
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
 
-        {/* Stack */}
-        <div className="flex flex-wrap gap-2">
-          {exp.stack.map((s) => (
-            <span
-              key={s}
-              className="text-xs font-medium px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-slate-300 hover:border-violet-500/40 hover:bg-violet-500/10 hover:text-white transition-all duration-300"
-            >
-              {s}
-            </span>
-          ))}
         </div>
-
-      </div>
+      </MagneticCard>
     </div>
   );
 }
 
-export default function Experience() {
-  const headerRef = useRef(null);
-  const [headerVisible, setHeaderVisible] = useState(false);
-
+/* ─── Floating particle background ─── */
+function Particles() {
+  const canvasRef = useRef(null);
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setHeaderVisible(true); },
-      { threshold: 0.3 }
-    );
-    if (headerRef.current) observer.observe(headerRef.current);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let W = canvas.offsetWidth, H = canvas.offsetHeight;
+    canvas.width = W; canvas.height = H;
+
+    const dots = Array.from({ length: 28 }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.2 + 0.4,
+      dx: (Math.random() - 0.5) * 0.25,
+      dy: (Math.random() - 0.5) * 0.25,
+      alpha: Math.random() * 0.4 + 0.1,
+    }));
+
+    let raf;
+    const loop = () => {
+      ctx.clearRect(0, 0, W, H);
+      dots.forEach(d => {
+        d.x += d.dx; d.y += d.dy;
+        if (d.x < 0) d.x = W; if (d.x > W) d.x = 0;
+        if (d.y < 0) d.y = H; if (d.y > H) d.y = 0;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(139,92,246,${d.alpha})`;
+        ctx.fill();
+      });
+      raf = requestAnimationFrame(loop);
+    };
+    loop();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      style={{ opacity: 0.6 }}
+    />
+  );
+}
+
+/* ─── Animated section header ─── */
+function SectionHeader() {
+  const ref = useRef(null);
+  const [v, setV] = useState(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(([e]) => { if (e.isIntersecting) setV(true); }, { threshold: 0.4 });
+    if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section id="experience" className="relative py-28 bg-slate-950 overflow-hidden">
+    <div ref={ref} className="text-center mb-20">
+      <p
+        className="uppercase tracking-[0.35em] text-violet-400 text-xs font-semibold mb-3"
+        style={{ opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.1s" }}
+      >
+        My Journey
+      </p>
 
-      {/* Background Glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-0 w-[450px] h-[450px] bg-violet-700/10 blur-[140px]" />
-        <div className="absolute bottom-0 right-0 w-[450px] h-[450px] bg-blue-600/10 blur-[140px]" />
-      </div>
-
-      <div className="relative z-10 max-w-5xl mx-auto px-6">
-
-        {/* Header */}
-        <div
-          ref={headerRef}
-          className="text-center mb-20"
+      <div className="overflow-hidden">
+        <h2
+          className="text-4xl md:text-5xl font-black text-white"
           style={{
-            transition: "opacity 0.7s ease, transform 0.7s ease",
-            opacity: headerVisible ? 1 : 0,
-            transform: headerVisible ? "translateY(0)" : "translateY(30px)",
+            opacity: v ? 1 : 0,
+            transform: v ? "translateY(0)" : "translateY(48px)",
+            transition: "opacity 0.7s ease 0.2s, transform 0.7s cubic-bezier(0.22,1,0.36,1) 0.2s",
           }}
         >
-          <p className="uppercase tracking-[0.3em] text-violet-400 text-sm mb-3">
-            My Journey
-          </p>
-          <h2 className="text-4xl md:text-5xl font-black text-white">
-            Work Experience
-          </h2>
-          <p className="mt-4 max-w-xl mx-auto text-slate-400">
-            Real-world projects and roles that shaped my skills as a full-stack developer.
-          </p>
-        </div>
-
-        {/* Cards */}
-        <div className="space-y-8">
-          {experiences.map((exp, i) => (
-            <ExpCard key={i} exp={exp} i={i} />
-          ))}
-        </div>
-
+          Work Experience
+        </h2>
       </div>
-    </section>
+
+      {/* Expanding accent line */}
+      <div className="flex justify-center my-4">
+        <div
+          className="h-px"
+          style={{
+            background: "linear-gradient(90deg, transparent, #7c3aed, #a78bfa, #7c3aed, transparent)",
+            width: v ? "220px" : "0px",
+            transition: "width 1.1s cubic-bezier(0.22,1,0.36,1) 0.4s",
+          }}
+        />
+      </div>
+
+      <p
+        className="max-w-xl mx-auto text-slate-400 text-sm"
+        style={{ opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.5s" }}
+      >
+        Real-world projects and roles that shaped my skills as a full-stack developer.
+      </p>
+    </div>
+  );
+}
+
+/* ─── Main export ─── */
+export default function Experience() {
+  return (
+    <>
+      <style>{`
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+      `}</style>
+
+      <section id="experience" className="relative py-28 bg-slate-950 overflow-hidden">
+        {/* Ambient glows */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-violet-800/8 blur-[180px]" />
+          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-blue-700/8 blur-[180px]" />
+        </div>
+
+        <Particles />
+
+        <div className="relative z-10 max-w-4xl mx-auto px-6">
+          <SectionHeader />
+
+          <div className="space-y-10">
+            {experiences.map((exp, i) => (
+              <ExpCard key={i} exp={exp} i={i} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

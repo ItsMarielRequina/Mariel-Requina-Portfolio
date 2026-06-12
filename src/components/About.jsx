@@ -1,10 +1,12 @@
 import { useState } from "react";
-import profileImg from "../assets/profile.png";
+import graduationImg from "../assets/graduation.jpg";
+import atWorkImg from "../assets/atwork.jpg";
+import setupImg from "../assets/setup.jpg";
 
 const photos = [
-  { src: profileImg, label: "Graduation Day" },
-  { src: profileImg, label: "At Work" },
-  { src: profileImg, label: "My Setup" },
+  { src: graduationImg, label: "Graduation Day" },
+  { src: atWorkImg, label: "At Work" },
+  { src: setupImg, label: "My Setup" },
 ];
 
 export default function About() {
@@ -113,31 +115,26 @@ export default function About() {
             Who I Am
           </p>
           <h2 className="text-4xl font-bold text-white mb-6 leading-tight">
-            A Passionate Developer<br />
-            <span className="text-violet-400 italic">Rooted in Purpose</span>
+            A Full-Stack Developer<br />
+            <span className="text-violet-400 italic">Inspired by Purpose</span>
           </h2>
 
           <div className="space-y-4 text-slate-300 leading-relaxed">
             <p>
-              I'm <span className="font-semibold text-white">Mariel</span>, an IT graduate from Davao City, Philippines,
-              with a genuine love for building web systems that are both beautiful and functional.
+              I'm <span className="font-semibold text-white">Mariel</span>, an IT graduate from Holy Cross of Davao College, Davao City, Philippines,
+              with a genuine love for building mobile applications & web systems that are both beautiful, creative and functional.
             </p>
             <p>
-              My work spans full-stack web development — from crafting pixel-perfect, responsive front-ends
-              to building structured back-end systems in Laravel. I thrive on turning complex requirements
+              My work spans full-stack web and software development — from crafting pixel, responsive front-ends
+              to building structured back-end systems in my specialized programming languages. I thrive on turning complex requirements
               into clean, maintainable code.
-            </p>
-            <p>
-              When I'm not writing code, I'm exploring design systems, tinkering with new frameworks,
-              or working on meaningful projects for real institutions like DSWD.
             </p>
           </div>
 
           <div className="mt-8 grid grid-cols-3 gap-4 text-center">
             {[
-              { value: "15+", label: "Projects Completed" },
+              { value: "13+", label: "Projects Completed" },
               { value: "2+", label: "Years Experience" },
-              { value: "10+", label: "Technologies" },
             ].map(stat => (
               <div key={stat.label} className="bg-white/5 rounded-2xl p-4 border border-white/10">
                 <p className="text-2xl font-bold text-violet-400">{stat.value}</p>
