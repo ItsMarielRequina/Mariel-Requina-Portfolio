@@ -1,168 +1,220 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const links = [
-"About",
-"Skills",
-"Education",
-"Experience",
-"Projects",
-"Certifications",
+  "About",
+  "Skills",
+  "Education",
+  "Experience",
+  "Projects",
+  "Certifications",
 ];
 
 export default function Navbar() {
-const [scrolled, setScrolled] = useState(false);
-const [open, setOpen] = useState(false);
-const [active, setActive] = useState("About");
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState("About");
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
 
-useEffect(() => {
-const handleScroll = () => {
-setScrolled(window.scrollY > 40);
+  const navRef = useRef(null);
+  const linkRefs = useRef({});
 
-  const sections = links.map((link) =>
-    document.getElementById(link.toLowerCase())
-  );
+  const updateIndicator = (activeLink) => {
+    const el = linkRefs.current[activeLink];
+    if (!el || !navRef.current) return;
 
-  sections.forEach((section, index) => {
-    if (!section) return;
+    const navRect = navRef.current.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
 
-    const top = section.offsetTop - 120;
-    const bottom = top + section.offsetHeight;
+    setIndicatorStyle({
+      left: elRect.left - navRect.left,
+      width: elRect.width,
+    });
+  };
 
-    if (window.scrollY >= top && window.scrollY < bottom) {
-      setActive(links[index]);
-    }
-  });
-};
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 30);
 
-window.addEventListener("scroll", handleScroll);
-handleScroll();
+      links.forEach((link) => {
+        const section = document.getElementById(link.toLowerCase());
+        if (!section) return;
 
-return () => window.removeEventListener("scroll", handleScroll);
+        const top = section.offsetTop - 140;
+        const bottom = top + section.offsetHeight;
 
-}, []);
+        if (window.scrollY >= top && window.scrollY < bottom) {
+          setActive(link);
+        }
+      });
+    };
 
-return (
-<header
-style={{
-backdropFilter: "blur(20px)",
-WebkitBackdropFilter: "blur(20px)",
-}}
-className={
-scrolled
-? "fixed top-0 left-0 right-0 z-50 bg-slate-950/85 border-b border-white/[0.06] shadow-lg shadow-black/20 transition-all duration-300"
-: "fixed top-0 left-0 right-0 z-50 bg-transparent border-b border-transparent transition-all duration-300"
-}
-> <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-{/* Logo */} <a
-       href="#hero"
-       className="text-lg font-black tracking-tight text-white"
-     >
-Mariel<span className="text-violet-400">Requina</span> </a>
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
 
-    {/* Desktop Navigation */}
-    <ul className="hidden md:flex items-center gap-1 text-sm font-medium">
-      {links.map((link) => (
-        <li key={link}>
-          <a
-            href={`#${link.toLowerCase()}`}
-            onClick={() => setActive(link)}
-            className={`px-3 py-1.5 rounded-lg transition-all duration-200 ${
-              active === link
-                ? "text-violet-400 bg-violet-400/10"
-                : "text-slate-400 hover:text-white hover:bg-white/[0.06]"
-            }`}
-          >
-            {link}
-          </a>
-        </li>
-      ))}
-    </ul>
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    {/* Right Section */}
-    <div className="flex items-center gap-3">
-      <a
-        href="#contact"
-        className="hidden md:inline-flex px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold transition"
+  useEffect(() => {
+    updateIndicator(active);
+  }, [active]);
+
+  useEffect(() => {
+    const handleResize = () => updateIndicator(active);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [active]);
+
+  return (
+    <>
+      <header
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+        style={{
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          background: scrolled
+            ? "rgba(5,8,22,0.88)"
+            : "rgba(5,8,22,0.20)",
+          borderBottom: scrolled
+            ? "1px solid rgba(255,255,255,0.05)"
+            : "1px solid transparent",
+        }}
       >
-        Contact
-      </a>
-
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setOpen(!open)}
-        className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-white/[0.06] border border-white/[0.08] text-slate-400 hover:text-white transition"
-        aria-label="Toggle menu"
-      >
-        {open ? (
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2.5}
-              d="M6 18L18 6M6 6l12 12"
+        {scrolled && (
+          <>
+            <div
+              className="absolute top-0 left-0 right-0 h-px"
+              style={{
+                background:
+                  "linear-gradient(90deg,transparent,rgba(139,92,246,.7),rgba(99,102,241,.7),transparent)",
+              }}
             />
-          </svg>
-        ) : (
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2.5}
-              d="M4 8h16M4 16h16"
+            <div
+              className="absolute left-1/2 top-0 -translate-x-1/2 pointer-events-none"
+              style={{
+                width: 500,
+                height: 120,
+                background:
+                  "radial-gradient(circle, rgba(109,40,217,.18), transparent 70%)",
+                filter: "blur(40px)",
+              }}
             />
-          </svg>
+          </>
         )}
-      </button>
-    </div>
-  </nav>
 
-  {/* Mobile Menu */}
-  {open && (
-    <div className="md:hidden border-t border-white/[0.06] bg-slate-950 px-6 pt-3 pb-6 flex flex-col gap-1">
-      {links.map((link) => (
-        <a
-          key={link}
-          href={`#${link.toLowerCase()}`}
-          onClick={() => {
-            setActive(link);
-            setOpen(false);
-          }}
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
-            active === link
-              ? "text-violet-400 bg-violet-400/[0.08]"
-              : "text-slate-400 hover:text-white hover:bg-white/[0.05]"
-          }`}
+        <nav
+          ref={navRef}
+          className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between"
         >
-          <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              active === link ? "bg-violet-400" : "bg-slate-600"
-            }`}
-          />
-          {link}
-        </a>
-      ))}
+          <a href="#hero" className="flex items-center gap-2 font-black text-lg">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-violet-500" />
+            </span>
 
-      <div className="h-px bg-white/[0.05] my-2" />
+            <span
+              style={{
+                background:
+                  "linear-gradient(135deg,#fff 0%,rgba(196,181,253,.8) 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Mariel
+            </span>
 
-      <a
-        href="#contact"
-        onClick={() => setOpen(false)}
-        className="mt-1 text-center px-4 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold transition"
-      >
-        Contact Me
-      </a>
-    </div>
-  )}
-</header>
-);
+            <span
+              style={{
+                background:
+                  "linear-gradient(135deg,#a78bfa 0%,#7c3aed 50%,#c4b5fd 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Requina
+            </span>
+          </a>
+
+          <div className="hidden md:flex items-center relative">
+            {indicatorStyle.width > 0 && (
+              <div
+                className="absolute h-9 rounded-xl transition-all duration-300"
+                style={{
+                  left: indicatorStyle.left,
+                  width: indicatorStyle.width,
+                  background: "rgba(139,92,246,.12)",
+                  border: "1px solid rgba(139,92,246,.25)",
+                  boxShadow: "0 0 20px rgba(124,58,237,.18)",
+                }}
+              />
+            )}
+
+            <ul className="flex items-center relative z-10">
+              {links.map((link) => (
+                <li key={link}>
+                  <a
+                    ref={(el) => (linkRefs.current[link] = el)}
+                    href={`#${link.toLowerCase()}`}
+                    onClick={() => setActive(link)}
+                    className="relative px-4 py-2 text-sm rounded-xl transition-all duration-300"
+                    style={{
+                      color:
+                        active === link
+                          ? "#c4b5fd"
+                          : "rgba(148,163,184,.75)",
+                    }}
+                  >
+                    {link}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <a
+              href="#contact"
+              className="hidden md:flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold text-white"
+              style={{
+                background:
+                  "linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%)",
+                boxShadow: "0 0 24px rgba(124,58,237,.4)",
+              }}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+              Hire Me
+            </a>
+
+            <button
+              onClick={() => setOpen(!open)}
+              className="md:hidden w-10 h-10 rounded-xl"
+            >
+              ☰
+            </button>
+          </div>
+        </nav>
+
+        {open && (
+          <div className="md:hidden px-4 pb-4">
+            {links.map((link) => (
+              <a
+                key={link}
+                href={`#${link.toLowerCase()}`}
+                onClick={() => {
+                  setActive(link);
+                  setOpen(false);
+                }}
+                className="block px-4 py-3 rounded-xl"
+                style={{
+                  color:
+                    active === link ? "#c4b5fd" : "rgba(148,163,184,.8)",
+                }}
+              >
+                {link}
+              </a>
+            ))}
+          </div>
+        )}
+      </header>
+    </>
+  );
 }

@@ -105,7 +105,7 @@ function ProjectModal({ project, onClose }) {
       onClick={(e) => e.target === overlayRef.current && onClose()}
       style={{
         position: "fixed", inset: 0, zIndex: 200,
-        background: "rgba(2,6,23,0.92)",
+        background: "rgba(5,8,22,0.93)",
         backdropFilter: "blur(18px)",
         WebkitBackdropFilter: "blur(18px)",
         display: "flex", alignItems: "center", justifyContent: "center",
@@ -114,25 +114,44 @@ function ProjectModal({ project, onClose }) {
         transition: "opacity 0.3s ease",
       }}
     >
+      {/* Noise texture inside modal overlay */}
+      <div
+        style={{
+          position: "absolute", inset: 0, pointerEvents: "none", opacity: 0.03,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "repeat", backgroundSize: "128px",
+        }}
+      />
+
       <div
         style={{
           width: "100%", maxWidth: "800px",
-          background: "linear-gradient(160deg, #1a1035 0%, #0d0d2b 100%)",
+          background: "linear-gradient(160deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.015) 100%)",
           border: `1px solid ${project.accent}44`,
           borderRadius: "28px",
           overflow: "hidden",
-          boxShadow: `0 0 0 1px ${project.accent}22, 0 40px 80px rgba(0,0,0,0.7), 0 0 60px rgba(${project.accentRgb},0.12)`,
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          boxShadow: `0 0 0 1px ${project.accent}22, 0 40px 80px rgba(0,0,0,0.7), 0 0 60px rgba(${project.accentRgb},0.12), inset 0 1px 0 rgba(255,255,255,0.07)`,
           transform: entering ? "scale(0.94) translateY(20px)" : "scale(1) translateY(0)",
           transition: "transform 0.4s cubic-bezier(0.22,1,0.36,1)",
         }}
       >
+        {/* Top accent bar */}
+        <div
+          style={{
+            height: "2px",
+            background: `linear-gradient(90deg, transparent 0%, ${project.accent} 40%, ${project.accent} 60%, transparent 100%)`,
+          }}
+        />
+
         {/* Modal top bar */}
         <div
           style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
             padding: "18px 24px",
             borderBottom: "1px solid rgba(255,255,255,0.06)",
-            background: `linear-gradient(135deg, rgba(${project.accentRgb},0.15), rgba(${project.accentRgb},0.04))`,
+            background: `linear-gradient(135deg, rgba(${project.accentRgb},0.12), rgba(${project.accentRgb},0.03))`,
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -162,11 +181,10 @@ function ProjectModal({ project, onClose }) {
         </div>
 
         {/* Image viewer */}
-        <div style={{ position: "relative", height: "360px", background: "#060618", overflow: "hidden" }}>
-          {/* Scan line effect */}
+        <div style={{ position: "relative", height: "360px", background: "rgba(5,8,22,0.8)", overflow: "hidden" }}>
           <div style={{
             position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none",
-            backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px)",
+            backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)",
           }} />
           <img
             src={project.images[activeImg]}
@@ -178,34 +196,31 @@ function ProjectModal({ project, onClose }) {
               transition: "opacity 0.22s ease, transform 0.22s ease",
             }}
           />
-          {/* Vignette */}
           <div style={{
             position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2,
-            background: `radial-gradient(ellipse at center, transparent 50%, rgba(6,6,24,0.6) 100%)`,
+            background: `radial-gradient(ellipse at center, transparent 50%, rgba(5,8,22,0.6) 100%)`,
           }} />
-          {/* Corner accent glow */}
           <div style={{
             position: "absolute", bottom: 0, left: 0, right: 0, height: "80px",
             background: `linear-gradient(to top, rgba(${project.accentRgb},0.08), transparent)`,
             pointerEvents: "none", zIndex: 2,
           }} />
 
-          {/* Arrows */}
           {[{ side: "left", fn: prev, icon: "M15 19l-7-7 7-7" }, { side: "right", fn: next, icon: "M9 5l7 7-7 7" }].map(({ side, fn, icon }) => (
             <button
               key={side}
               onClick={fn}
               style={{
                 position: "absolute", top: "50%", [side]: "14px",
-                transform: "translateY(-50%)",
-                zIndex: 4, width: "38px", height: "38px", borderRadius: "12px",
-                background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.12)",
+                transform: "translateY(-50%)", zIndex: 4,
+                width: "38px", height: "38px", borderRadius: "12px",
+                background: "rgba(5,8,22,0.6)", border: "1px solid rgba(255,255,255,0.12)",
                 color: "#fff", cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 backdropFilter: "blur(4px)", transition: "background 0.2s",
               }}
               onMouseEnter={e => e.currentTarget.style.background = `rgba(${project.accentRgb},0.4)`}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(0,0,0,0.55)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(5,8,22,0.6)"}
             >
               <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
@@ -213,10 +228,9 @@ function ProjectModal({ project, onClose }) {
             </button>
           ))}
 
-          {/* Counter pill */}
           <div style={{
             position: "absolute", bottom: "12px", right: "14px", zIndex: 4,
-            background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)",
+            background: "rgba(5,8,22,0.7)", backdropFilter: "blur(4px)",
             border: `1px solid ${project.accent}44`,
             borderRadius: "20px", padding: "3px 10px",
             fontSize: "11px", color: "#94a3b8",
@@ -243,7 +257,6 @@ function ProjectModal({ project, onClose }) {
             </div>
           ))}
         </div>
-
       </div>
     </div>
   );
@@ -318,6 +331,8 @@ function ProjectCard({ project, i, onPreview }) {
         className="relative overflow-hidden rounded-3xl border flex flex-col h-full"
         style={{
           background: "linear-gradient(155deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 100%)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
           borderColor: hovered ? `${project.accent}55` : "rgba(255,255,255,0.09)",
           boxShadow: hovered
             ? `0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 50px rgba(${project.accentRgb},0.14)`
@@ -327,7 +342,7 @@ function ProjectCard({ project, i, onPreview }) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        {/* Mouse-tracking radial spotlight */}
+        {/* Mouse spotlight */}
         <div
           className="pointer-events-none absolute inset-0 rounded-3xl z-0"
           style={{
@@ -337,12 +352,12 @@ function ProjectCard({ project, i, onPreview }) {
           }}
         />
 
-        {/* Top shimmer line */}
+        {/* Top accent bar */}
         <div
-          className="absolute top-0 left-0 right-0 h-px z-10"
+          className="absolute top-0 left-0 right-0 h-[2px] z-10"
           style={{
-            background: `linear-gradient(90deg, transparent, ${project.accent}bb, transparent)`,
-            opacity: hovered ? 1 : 0.4,
+            background: `linear-gradient(90deg, transparent 0%, ${project.accent} 40%, ${project.accent} 60%, transparent 100%)`,
+            opacity: hovered ? 1 : 0.35,
             transition: "opacity 0.3s",
           }}
         />
@@ -354,7 +369,6 @@ function ProjectCard({ project, i, onPreview }) {
             background: `linear-gradient(135deg, rgba(${project.accentRgb},0.14) 0%, rgba(${project.accentRgb},0.04) 100%)`,
           }}
         >
-          {/* Emoji box with inner glow */}
           <div
             className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
             style={{
@@ -362,7 +376,6 @@ function ProjectCard({ project, i, onPreview }) {
               border: `1px solid rgba(${project.accentRgb},0.3)`,
               boxShadow: hovered ? `0 0 20px rgba(${project.accentRgb},0.3)` : "none",
               transition: "box-shadow 0.3s",
-              filter: hovered ? "drop-shadow(0 0 8px " + project.accent + "88)" : "none",
             }}
           >
             {project.emoji}
@@ -375,23 +388,26 @@ function ProjectCard({ project, i, onPreview }) {
             </p>
           </div>
 
-          {/* Animated corner badge */}
-          <div
-            className="absolute top-4 right-4 w-2 h-2 rounded-full"
-            style={{
-              background: project.accent,
-              boxShadow: `0 0 8px ${project.accent}`,
-              animation: "pulse-dot 2s ease-in-out infinite",
-            }}
-          />
+          {/* Pulsing dot — same as Hero's "available" indicator */}
+          <div className="absolute top-4 right-4 flex h-2.5 w-2.5">
+            <span
+              className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+              style={{ background: project.accent }}
+            />
+            <span
+              className="relative inline-flex rounded-full h-2.5 w-2.5"
+              style={{ background: project.accent }}
+            />
+          </div>
         </div>
 
         {/* Body */}
         <div className="relative z-10 flex flex-col flex-1 px-7 py-6 gap-5">
+          <p className="text-sm leading-relaxed" style={{ color: "rgba(148,163,184,0.75)" }}>
+            {project.description}
+          </p>
 
-          <p className="text-slate-400 text-sm leading-relaxed">{project.description}</p>
-
-          {/* Highlight chips with check icons */}
+          {/* Highlight chips */}
           <div className="flex flex-wrap gap-2">
             {project.highlights.map((h, j) => (
               <span
@@ -414,16 +430,23 @@ function ProjectCard({ project, i, onPreview }) {
             ))}
           </div>
 
-          <div className="h-px" style={{ background: "rgba(255,255,255,0.06)" }} />
+          {/* Divider — same gradient style as Hero */}
+          <div
+            className="h-px w-full"
+            style={{
+              background: "linear-gradient(90deg, transparent, rgba(139,92,246,0.3), transparent)",
+            }}
+          />
 
           {/* Stack tags */}
           <div className="flex flex-wrap gap-2">
             {project.stack.map((s, j) => (
               <span
                 key={s}
-                className="text-xs font-medium px-3 py-1 rounded-full border border-white/10 text-slate-300 transition-all duration-300 cursor-default"
+                className="text-xs font-medium px-3 py-1 rounded-full border border-white/10 cursor-default"
                 style={{
                   background: "rgba(255,255,255,0.03)",
+                  color: "rgb(203,213,225)",
                   opacity: visible ? 1 : 0,
                   transition: `opacity 0.4s ease ${delay + 0.35 + j * 0.04}s, background 0.2s, border-color 0.2s, color 0.2s`,
                 }}
@@ -443,7 +466,7 @@ function ProjectCard({ project, i, onPreview }) {
             ))}
           </div>
 
-          {/* View screenshots CTA */}
+          {/* CTA button — styled like Hero's ghost buttons */}
           <button
             onClick={() => onPreview(project)}
             onMouseEnter={() => setBtnHover(true)}
@@ -454,8 +477,9 @@ function ProjectCard({ project, i, onPreview }) {
               width: "100%",
               borderRadius: "14px",
               border: `1px solid ${btnHover ? project.accent + "88" : `rgba(${project.accentRgb},0.25)`}`,
-              background: btnHover ? `rgba(${project.accentRgb},0.18)` : `rgba(${project.accentRgb},0.07)`,
-              color: project.accent,
+              background: btnHover ? `rgba(${project.accentRgb},0.18)` : "rgba(255,255,255,0.04)",
+              backdropFilter: "blur(10px)",
+              color: btnHover ? "#fff" : project.accent,
               fontSize: "13px",
               fontWeight: 600,
               cursor: "pointer",
@@ -463,9 +487,9 @@ function ProjectCard({ project, i, onPreview }) {
               alignItems: "center",
               justifyContent: "center",
               gap: "7px",
-              transition: "background 0.25s, border-color 0.25s, transform 0.15s",
-              transform: btnHover ? "scale(1.01)" : "scale(1)",
-              boxShadow: btnHover ? `0 0 20px rgba(${project.accentRgb},0.2)` : "none",
+              transition: "background 0.25s, border-color 0.25s, transform 0.15s, color 0.2s",
+              transform: btnHover ? "translateY(-1px)" : "translateY(0)",
+              boxShadow: btnHover ? `0 0 24px rgba(${project.accentRgb},0.3)` : "none",
             }}
           >
             <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -474,72 +498,137 @@ function ProjectCard({ project, i, onPreview }) {
             View Screenshots
             <svg
               width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-              style={{ opacity: btnHover ? 1 : 0, transform: btnHover ? "translateX(0)" : "translateX(-4px)", transition: "opacity 0.2s, transform 0.2s" }}
+              style={{
+                opacity: btnHover ? 1 : 0,
+                transform: btnHover ? "translateX(0)" : "translateX(-4px)",
+                transition: "opacity 0.2s, transform 0.2s",
+              }}
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
-
         </div>
       </MagneticCard>
     </div>
   );
 }
 
-/* ─── Floating particles canvas ─── */
-function Particles() {
-  const ref = useRef(null);
+/* ─── Connected particle canvas (matches Hero exactly) ─── */
+function ParticleCanvas() {
+  const canvasRef = useRef(null);
+
   useEffect(() => {
-    const c = ref.current;
-    if (!c) return;
-    const ctx = c.getContext("2d");
-    c.width = c.offsetWidth; c.height = c.offsetHeight;
-    const pts = Array.from({ length: 32 }, () => ({
-      x: Math.random() * c.width, y: Math.random() * c.height,
-      r: Math.random() * 1.3 + 0.3,
-      dx: (Math.random() - 0.5) * 0.2, dy: (Math.random() - 0.5) * 0.2,
-      a: Math.random() * 0.35 + 0.08,
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let animId;
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const particles = Array.from({ length: 60 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.3,
+      dx: (Math.random() - 0.5) * 0.3,
+      dy: (Math.random() - 0.5) * 0.3,
+      alpha: Math.random() * 0.5 + 0.1,
     }));
-    let raf;
-    const loop = () => {
-      ctx.clearRect(0, 0, c.width, c.height);
-      pts.forEach(p => {
-        p.x += p.dx; p.y += p.dy;
-        if (p.x < 0) p.x = c.width; if (p.x > c.width) p.x = 0;
-        if (p.y < 0) p.y = c.height; if (p.y > c.height) p.y = 0;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p) => {
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(139,92,246,${p.a})`;
+        ctx.fillStyle = `rgba(167,139,250,${p.alpha})`;
         ctx.fill();
       });
-      raf = requestAnimationFrame(loop);
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dist = Math.hypot(
+            particles[i].x - particles[j].x,
+            particles[i].y - particles[j].y
+          );
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(139,92,246,${0.15 * (1 - dist / 100)})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      animId = requestAnimationFrame(draw);
     };
-    loop();
-    return () => cancelAnimationFrame(raf);
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+    };
   }, []);
-  return <canvas ref={ref} className="absolute inset-0 w-full h-full pointer-events-none" style={{ opacity: 0.5 }} />;
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none"
+    />
+  );
 }
 
 /* ─── Section header ─── */
 function SectionHeader() {
   const ref = useRef(null);
   const [v, setV] = useState(false);
+
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setV(true); }, { threshold: 0.3 });
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setV(true); },
+      { threshold: 0.3 }
+    );
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
   }, []);
 
   return (
     <div ref={ref} className="text-center mb-20">
-      <p style={{ opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.1s" }}
-        className="uppercase tracking-[0.35em] text-violet-400 text-xs font-semibold mb-3">
-        What I've Built
-      </p>
+      {/* Pulsing badge — matches Hero */}
+      <div
+        className="inline-flex items-center gap-2 mb-4"
+        style={{ opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.1s" }}
+      >
+        <div className="relative flex h-2.5 w-2.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-violet-500" />
+        </div>
+        <span
+          className="text-xs uppercase tracking-[0.35em] font-medium"
+          style={{ color: "rgba(196,181,253,0.8)" }}
+        >
+          What I've Built
+        </span>
+      </div>
+
+      {/* Title — gradient matches Hero's h1 */}
       <div className="overflow-hidden">
         <h2
-          className="text-4xl md:text-5xl font-black text-white"
+          className="text-4xl md:text-5xl font-black uppercase"
           style={{
+            background: "linear-gradient(135deg, #fff 30%, rgba(196,181,253,0.7) 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            letterSpacing: "-0.03em",
             opacity: v ? 1 : 0,
             transform: v ? "translateY(0)" : "translateY(50px)",
             transition: "opacity 0.7s ease 0.2s, transform 0.7s cubic-bezier(0.22,1,0.36,1) 0.2s",
@@ -549,17 +638,26 @@ function SectionHeader() {
         </h2>
       </div>
 
+      {/* Expanding accent line */}
       <div className="flex justify-center my-4">
-        <div style={{
-          height: "1px",
-          background: "linear-gradient(90deg, transparent, #7c3aed, #a78bfa, #7c3aed, transparent)",
-          width: v ? "200px" : "0px",
-          transition: "width 1.1s cubic-bezier(0.22,1,0.36,1) 0.4s",
-        }} />
+        <div
+          style={{
+            height: "1px",
+            background: "linear-gradient(90deg, transparent, #7c3aed, #a78bfa, #7c3aed, transparent)",
+            width: v ? "200px" : "0px",
+            transition: "width 1.1s cubic-bezier(0.22,1,0.36,1) 0.4s",
+          }}
+        />
       </div>
 
-      <p style={{ opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.5s" }}
-        className="max-w-xl mx-auto text-slate-400 text-sm">
+      <p
+        className="max-w-xl mx-auto text-sm"
+        style={{
+          color: "rgba(148,163,184,0.75)",
+          opacity: v ? 1 : 0,
+          transition: "opacity 0.6s ease 0.5s",
+        }}
+      >
         A selection of real-world systems and apps I've designed and developed from scratch.
       </p>
     </div>
@@ -569,6 +667,21 @@ function SectionHeader() {
 /* ─── Main export ─── */
 export default function Projects() {
   const [activeProject, setActiveProject] = useState(null);
+  const sectionRef = useRef(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouse = (e) => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      setMousePos({
+        x: ((e.clientX - rect.left) / rect.width - 0.5) * 20,
+        y: ((e.clientY - rect.top) / rect.height - 0.5) * 20,
+      });
+    };
+    window.addEventListener("mousemove", handleMouse);
+    return () => window.removeEventListener("mousemove", handleMouse);
+  }, []);
 
   return (
     <>
@@ -579,14 +692,84 @@ export default function Projects() {
         }
       `}</style>
 
-      <section id="projects" className="relative py-28 bg-slate-950 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-1/4 w-[550px] h-[550px] bg-violet-800/8 blur-[180px]" />
-          <div className="absolute bottom-0 left-1/4 w-[550px] h-[550px] bg-blue-700/8 blur-[180px]" />
+      <section
+        id="projects"
+        ref={sectionRef}
+        className="relative py-28 bg-[#050816] text-white overflow-hidden"
+      >
+        {/* Connected particle canvas */}
+        <ParticleCanvas />
+
+        {/* Ambient glows with mouse parallax */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div
+            className="absolute w-[700px] h-[700px] rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(109,40,217,0.18) 0%, transparent 70%)",
+              top: "-10%",
+              right: "-5%",
+              transform: `translate(${mousePos.x * -0.5}px, ${mousePos.y * 0.5}px)`,
+              transition: "transform 0.4s ease-out",
+            }}
+          />
+          <div
+            className="absolute w-[600px] h-[600px] rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%)",
+              bottom: "-10%",
+              left: "-5%",
+              transform: `translate(${mousePos.x * 0.4}px, ${mousePos.y * -0.4}px)`,
+              transition: "transform 0.4s ease-out",
+            }}
+          />
+          <div
+            className="absolute w-[400px] h-[400px] rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 70%)",
+              top: "40%",
+              left: "40%",
+            }}
+          />
         </div>
 
-        <Particles />
+        {/* Noise texture */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+            backgroundSize: "128px",
+          }}
+        />
 
+        {/* Decorative grid */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(139,92,246,0.04) 1px, transparent 1px)
+            `,
+            backgroundSize: "60px 60px",
+          }}
+        />
+
+        {/* Watermark */}
+        <div
+          className="absolute select-none pointer-events-none whitespace-nowrap font-black uppercase"
+          style={{
+            fontSize: "clamp(6rem, 18vw, 18rem)",
+            color: "rgba(255,255,255,0.018)",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          PROJECTS
+        </div>
+
+        {/* Content */}
         <div className="relative z-10 max-w-6xl mx-auto px-6">
           <SectionHeader />
           <div className="grid md:grid-cols-2 gap-8">

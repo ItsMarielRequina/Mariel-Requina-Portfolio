@@ -1,109 +1,175 @@
 import { FiGithub, FiLinkedin, FiFacebook, FiMail } from "react-icons/fi";
 
-const links = ["About", "Skills", "Education", "Experience", "Projects", "Certifications", "Contact"];
+const links = [
+  "About", "Skills", "Education",
+  "Experience", "Projects", "Certifications", "Contact"
+];
 
 const socials = [
-  { icon: <FiGithub size={16} />, href: "#", label: "GitHub" },
-  { icon: <FiLinkedin size={16} />, href: "#", label: "LinkedIn" },
-  { icon: <FiFacebook size={16} />, href: "#", label: "Facebook" },
-  { icon: <FiMail size={16} />, href: "#", label: "Email" },
+  { icon: <FiGithub size={15} />, href: "#", label: "GitHub" },
+  { icon: <FiLinkedin size={15} />, href: "#", label: "LinkedIn" },
+  { icon: <FiFacebook size={15} />, href: "#", label: "Facebook" },
+  { icon: <FiMail size={15} />, href: "#", label: "Email" },
+];
+
+const stack = [
+  { name: "React",        url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
+  { name: "Vite",         url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" },
+  { name: "Tailwind CSS", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" },
+  { name: "Laravel",      url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" },
 ];
 
 export default function Footer() {
   return (
-    <footer className="relative bg-slate-950 overflow-hidden border-t border-white/[0.06]">
+    <footer className="relative overflow-hidden border-t"
+      style={{ background: "#050816", borderColor: "rgba(255,255,255,0.06)" }}>
 
-      {/* Background glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-violet-700/10 blur-[100px]" />
+      {/* Ambient glow */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] h-[220px]"
+          style={{ background: "radial-gradient(ellipse at center bottom, rgba(124,58,237,0.12) 0%, transparent 70%)" }} />
+        <div className="absolute top-0 left-0 right-0 h-px"
+          style={{ background: "linear-gradient(90deg, transparent, rgba(139,92,246,0.35), rgba(99,102,241,0.35), transparent)" }} />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-14 pb-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-8">
 
-        {/* Top row */}
-        <div className="grid md:grid-cols-3 gap-10 pb-10 border-b border-white/[0.06]">
+        {/* Main grid */}
+        <div className="grid md:grid-cols-3 gap-12 pb-12"
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
 
-          {/* Brand */}
-          <div className="flex flex-col gap-4">
-            <a href="#hero" className="text-2xl font-black tracking-tight text-white">
-              Mariel<span className="text-violet-400">Requina</span>
-            </a>
-            <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
-              Full-stack developer passionate about building responsive interfaces and scalable web applications.
-            </p>
-            {/* Socials */}
-            <div className="flex gap-3 mt-1">
+          {/* Brand column */}
+          <div className="flex flex-col gap-5">
+            <div>
+              <a href="#about" className="inline-block text-2xl font-black tracking-tight text-white">
+                Mariel
+                <span style={{
+                  background: "linear-gradient(90deg, #a78bfa, #818cf8)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}>Requina</span>
+              </a>
+              <p className="mt-3 text-sm leading-relaxed max-w-[260px]"
+                style={{ color: "rgba(148,163,184,0.7)" }}>
+                Full-stack developer passionate about building responsive interfaces and scalable web applications.
+              </p>
+            </div>
+
+            {/* Social icons */}
+            <div className="flex gap-2">
               {socials.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  aria-label={s.label}
-                  className="w-9 h-9 rounded-xl flex items-center justify-center border border-white/10 bg-white/[0.04] text-slate-400 hover:text-white hover:border-violet-500/40 hover:bg-violet-500/10 transition-all duration-200"
+                <a key={s.label} href={s.href} aria-label={s.label}
+                  className="group w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    color: "rgba(148,163,184,0.65)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(139,92,246,0.12)";
+                    e.currentTarget.style.borderColor = "rgba(139,92,246,0.35)";
+                    e.currentTarget.style.color = "#c4b5fd";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                    e.currentTarget.style.color = "rgba(148,163,184,0.65)";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
                 >
                   {s.icon}
                 </a>
               ))}
             </div>
+
+            {/* Available badge */}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl w-fit"
+              style={{
+                background: "rgba(74,222,128,0.07)",
+                border: "1px solid rgba(74,222,128,0.18)",
+              }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse flex-shrink-0"
+                style={{ boxShadow: "0 0 6px #4ade80" }} />
+              <span className="text-xs font-semibold" style={{ color: "#4ade80" }}>
+                Available for hire
+              </span>
+            </div>
           </div>
 
-          {/* Nav links */}
-          <div className="flex flex-col gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-400 mb-1">
+          {/* Navigation column */}
+          <div className="flex flex-col gap-2">
+            <p className="text-[10px] uppercase tracking-[0.25em] font-semibold mb-3"
+              style={{ color: "rgba(139,92,246,0.7)" }}>
               Navigation
             </p>
             {links.map((l) => (
-              <a
-                key={l}
-                href={"#" + l.toLowerCase()}
-                className="text-sm text-slate-400 hover:text-white transition-colors duration-200 w-fit"
+              <a key={l} href={`#${l.toLowerCase()}`}
+                className="group flex items-center gap-2 text-sm w-fit transition-colors duration-200"
+                style={{ color: "rgba(148,163,184,0.6)" }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "#e2e8f0"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(148,163,184,0.6)"; }}
               >
+                <span className="w-3 h-px transition-all duration-200"
+                  style={{ background: "rgba(139,92,246,0.35)" }} />
                 {l}
               </a>
             ))}
           </div>
 
-          {/* Stack */}
+          {/* Stack column */}
           <div className="flex flex-col gap-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-400 mb-1">
+            <p className="text-[10px] uppercase tracking-[0.25em] font-semibold mb-1"
+              style={{ color: "rgba(139,92,246,0.7)" }}>
               Built With
             </p>
-            {[
-              { name: "React", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
-              { name: "Vite", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" },
-              { name: "Tailwind CSS", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" },
-              { name: "Laravel", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg" },
-            ].map((tech) => (
-              <div key={tech.name} className="flex items-center gap-2">
-                <img
-                  src={tech.url}
-                  alt={tech.name}
-                  className="w-4 h-4 object-contain"
-                  style={{ filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.5))" }}
-                  onError={(e) => { e.currentTarget.style.display = "none"; }}
-                />
-                <span className="text-sm text-slate-400">{tech.name}</span>
+            {stack.map((tech) => (
+              <div key={tech.name} className="flex items-center gap-3 group">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}>
+                  <img src={tech.url} alt={tech.name} className="w-4 h-4 object-contain"
+                    onError={(e) => { e.currentTarget.parentElement.style.display = "none"; }} />
+                </div>
+                <span className="text-sm" style={{ color: "rgba(148,163,184,0.7)" }}>
+                  {tech.name}
+                </span>
               </div>
             ))}
-
-            {/* Available badge */}
-            <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl bg-green-500/10 border border-green-500/20 w-fit">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse flex-shrink-0" />
-              <span className="text-green-400 text-xs font-semibold">Available for hire</span>
-            </div>
           </div>
-
         </div>
 
-        {/* Bottom row */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-6">
-          <p className="text-slate-600 text-xs">
-            {"© " + new Date().getFullYear() + " Mariel Requina. All rights reserved."}
+        {/* Bottom bar */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-3 pt-7">
+          <p className="text-xs" style={{ color: "rgba(100,116,139,0.5)" }}>
+            © {new Date().getFullYear()} Mariel Requina. All rights reserved.
           </p>
-          <p className="text-slate-600 text-xs flex items-center gap-1">
-            Designed & built with
-            <span className="text-violet-400 mx-1">♥</span>
-            by Mariel
-          </p>
+
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs" style={{ color: "rgba(100,116,139,0.4)" }}>
+              Designed & built with
+            </span>
+            <span style={{ color: "#a78bfa", fontSize: "14px" }}>♥</span>
+            <span className="text-xs" style={{ color: "rgba(100,116,139,0.4)" }}>
+              by Mariel
+            </span>
+          </div>
+
+          {/* Back to top */}
+          <a href="#about"
+            className="flex items-center gap-1.5 text-xs transition-all duration-200"
+            style={{ color: "rgba(100,116,139,0.5)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "#c4b5fd"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(100,116,139,0.5)"; }}
+          >
+            Back to top
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M6 9V3M6 3L3 6M6 3L9 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </a>
         </div>
 
       </div>

@@ -50,28 +50,77 @@ const experiences = [
   },
 ];
 
-/* ─── Animated counter for stats ─── */
-function Counter({ to, suffix = "" }) {
-  const [val, setVal] = useState(0);
-  const ref = useRef(null);
-  const started = useRef(false);
+/* ─── Connected particle canvas (matches Hero) ─── */
+function ParticleCanvas() {
+  const canvasRef = useRef(null);
+
   useEffect(() => {
-    const observer = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting && !started.current) {
-        started.current = true;
-        let start = 0;
-        const step = Math.ceil(to / 30);
-        const id = setInterval(() => {
-          start = Math.min(start + step, to);
-          setVal(start);
-          if (start >= to) clearInterval(id);
-        }, 40);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let animId;
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const particles = Array.from({ length: 60 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.3,
+      dx: (Math.random() - 0.5) * 0.3,
+      dy: (Math.random() - 0.5) * 0.3,
+      alpha: Math.random() * 0.5 + 0.1,
+    }));
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p) => {
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(167,139,250,${p.alpha})`;
+        ctx.fill();
+      });
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dist = Math.hypot(
+            particles[i].x - particles[j].x,
+            particles[i].y - particles[j].y
+          );
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(139,92,246,${0.15 * (1 - dist / 100)})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
       }
-    }, { threshold: 0.5 });
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [to]);
-  return <span ref={ref}>{val}{suffix}</span>;
+      animId = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none"
+    />
+  );
 }
 
 /* ─── Typewriter line ─── */
@@ -79,28 +128,35 @@ function TypeLine({ text, delay, accent }) {
   const [chars, setChars] = useState(0);
   const ref = useRef(null);
   const started = useRef(false);
+
   useEffect(() => {
-    const observer = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting && !started.current) {
-        started.current = true;
-        const t = setTimeout(() => {
-          let i = 0;
-          const id = setInterval(() => {
-            i++;
-            setChars(i);
-            if (i >= text.length) clearInterval(id);
-          }, 22);
-        }, delay);
-        return () => clearTimeout(t);
-      }
-    }, { threshold: 0.3 });
+    const observer = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting && !started.current) {
+          started.current = true;
+          const t = setTimeout(() => {
+            let i = 0;
+            const id = setInterval(() => {
+              i++;
+              setChars(i);
+              if (i >= text.length) clearInterval(id);
+            }, 22);
+          }, delay);
+          return () => clearTimeout(t);
+        }
+      },
+      { threshold: 0.3 }
+    );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, [text, delay]);
 
   const done = chars >= text.length;
   return (
-    <span ref={ref} className="flex items-start gap-3 text-sm text-slate-300 leading-relaxed">
+    <span
+      ref={ref}
+      className="flex items-start gap-3 text-sm text-slate-300 leading-relaxed"
+    >
       <span
         className="mt-[6px] w-1.5 h-1.5 rounded-full flex-shrink-0 transition-all duration-500"
         style={{
@@ -128,7 +184,7 @@ function StackBadge({ label, accent, visible, delay }) {
     <span
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="text-xs font-medium px-3 py-1 rounded-full border cursor-default select-none transition-all duration-300"
+      className="text-xs font-medium px-3 py-1 rounded-full border cursor-default select-none"
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? "translateY(0) scale(1)" : "translateY(8px) scale(0.92)",
@@ -144,7 +200,7 @@ function StackBadge({ label, accent, visible, delay }) {
   );
 }
 
-/* ─── Magnetic tilt wrapper ─── */
+/* ─── Magnetic tilt card ─── */
 function MagneticCard({ children, style, className }) {
   const ref = useRef(null);
   const raf = useRef(null);
@@ -173,7 +229,11 @@ function MagneticCard({ children, style, className }) {
     <div
       ref={ref}
       className={className}
-      style={{ ...style, willChange: "transform", transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)" }}
+      style={{
+        ...style,
+        willChange: "transform",
+        transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)",
+      }}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
     >
@@ -196,22 +256,21 @@ function ExpCard({ exp, i }) {
     return () => observer.disconnect();
   }, []);
 
-  const isEven = i % 2 === 0;
-
   return (
     <div
       ref={ref}
       className="relative"
       style={{
         opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : `translateY(60px)`,
+        transform: visible ? "translateY(0)" : "translateY(60px)",
         transition: `opacity 0.9s ease ${i * 0.2}s, transform 0.9s cubic-bezier(0.22,1,0.36,1) ${i * 0.2}s`,
       }}
     >
       <MagneticCard
         className="group relative overflow-hidden rounded-3xl border border-white/[0.08] backdrop-blur-xl"
         style={{
-          background: "linear-gradient(160deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.015) 100%)",
+          background:
+            "linear-gradient(160deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.015) 100%)",
           boxShadow: `0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07)`,
         }}
       >
@@ -234,23 +293,17 @@ function ExpCard({ exp, i }) {
         />
 
         <div className="relative z-10 p-8 md:p-10">
-
-          {/* Large ghost number */}
+          {/* Ghost number */}
           <div
             className="absolute top-6 right-8 text-[7rem] font-black leading-none select-none pointer-events-none"
-            style={{
-              color: exp.accent,
-              opacity: 0.04,
-              fontVariantNumeric: "tabular-nums",
-            }}
+            style={{ color: exp.accent, opacity: 0.04, fontVariantNumeric: "tabular-nums" }}
           >
             {exp.number}
           </div>
 
-          {/* ── Header row ── */}
+          {/* Header row */}
           <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
             <div className="flex-1 min-w-0">
-              {/* Role with animated underline */}
               <div className="relative inline-block mb-1">
                 <h3 className="text-2xl font-black text-white tracking-tight leading-none">
                   {exp.role}
@@ -264,16 +317,9 @@ function ExpCard({ exp, i }) {
                   }}
                 />
               </div>
-
-              {/* Company */}
-              <p
-                className="font-semibold text-sm mt-2 mb-1"
-                style={{ color: exp.accent }}
-              >
+              <p className="font-semibold text-sm mt-2 mb-1" style={{ color: exp.accent }}>
                 {exp.company}
               </p>
-
-              {/* Location */}
               <p className="text-slate-500 text-xs flex items-center gap-1">
                 <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -282,8 +328,6 @@ function ExpCard({ exp, i }) {
                 {exp.location}
               </p>
             </div>
-
-            {/* Badges */}
             <div className="flex flex-col items-end gap-2 flex-shrink-0">
               <span className="text-xs font-semibold text-slate-400 bg-white/[0.04] border border-white/10 px-3 py-1.5 rounded-full">
                 {exp.period}
@@ -296,7 +340,7 @@ function ExpCard({ exp, i }) {
             </div>
           </div>
 
-          {/* ── Divider with glow ── */}
+          {/* Divider with glow */}
           <div className="relative h-px mb-6">
             <div className="absolute inset-0 bg-white/[0.05]" />
             <div
@@ -309,7 +353,7 @@ function ExpCard({ exp, i }) {
             />
           </div>
 
-          {/* ── Description ── */}
+          {/* Description */}
           <p
             className="text-slate-400 text-sm leading-relaxed mb-6"
             style={{
@@ -321,24 +365,19 @@ function ExpCard({ exp, i }) {
             {exp.description}
           </p>
 
-          {/* ── Terminal-style bullet list ── */}
+          {/* Terminal bullet list */}
           <div
             className="rounded-2xl border border-white/[0.06] mb-6 overflow-hidden"
             style={{ background: "rgba(0,0,0,0.25)" }}
           >
-            {/* Terminal header bar */}
             <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.05]">
               <span className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
               <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
               <span className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
-              <span
-                className="ml-3 text-xs font-mono"
-                style={{ color: `${exp.accent}99` }}
-              >
+              <span className="ml-3 text-xs font-mono" style={{ color: `${exp.accent}99` }}>
                 {exp.type.toLowerCase()}.log
               </span>
             </div>
-            {/* Lines */}
             <div className="px-5 py-4 space-y-3 font-mono">
               {exp.bullets.map((b, j) => (
                 <TypeLine
@@ -351,7 +390,7 @@ function ExpCard({ exp, i }) {
             </div>
           </div>
 
-          {/* ── Stack badges ── */}
+          {/* Stack badges */}
           <div className="flex flex-wrap gap-2">
             {exp.stack.map((s, j) => (
               <StackBadge
@@ -363,81 +402,55 @@ function ExpCard({ exp, i }) {
               />
             ))}
           </div>
-
         </div>
       </MagneticCard>
     </div>
   );
 }
 
-/* ─── Floating particle background ─── */
-function Particles() {
-  const canvasRef = useRef(null);
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let W = canvas.offsetWidth, H = canvas.offsetHeight;
-    canvas.width = W; canvas.height = H;
-
-    const dots = Array.from({ length: 28 }, () => ({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      r: Math.random() * 1.2 + 0.4,
-      dx: (Math.random() - 0.5) * 0.25,
-      dy: (Math.random() - 0.5) * 0.25,
-      alpha: Math.random() * 0.4 + 0.1,
-    }));
-
-    let raf;
-    const loop = () => {
-      ctx.clearRect(0, 0, W, H);
-      dots.forEach(d => {
-        d.x += d.dx; d.y += d.dy;
-        if (d.x < 0) d.x = W; if (d.x > W) d.x = 0;
-        if (d.y < 0) d.y = H; if (d.y > H) d.y = 0;
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(139,92,246,${d.alpha})`;
-        ctx.fill();
-      });
-      raf = requestAnimationFrame(loop);
-    };
-    loop();
-    return () => cancelAnimationFrame(raf);
-  }, []);
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ opacity: 0.6 }}
-    />
-  );
-}
-
-/* ─── Animated section header ─── */
+/* ─── Section header ─── */
 function SectionHeader() {
   const ref = useRef(null);
   const [v, setV] = useState(false);
+
   useEffect(() => {
-    const observer = new IntersectionObserver(([e]) => { if (e.isIntersecting) setV(true); }, { threshold: 0.4 });
+    const observer = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) setV(true); },
+      { threshold: 0.4 }
+    );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
   return (
     <div ref={ref} className="text-center mb-20">
-      <p
-        className="uppercase tracking-[0.35em] text-violet-400 text-xs font-semibold mb-3"
+      {/* Badge — mirrors Hero's "Available for opportunities" pill */}
+      <div
+        className="inline-flex items-center gap-2 mb-4"
         style={{ opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.1s" }}
       >
-        My Journey
-      </p>
+        <div className="relative flex h-2.5 w-2.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-violet-500" />
+        </div>
+        <span
+          className="text-xs uppercase tracking-[0.35em] font-medium"
+          style={{ color: "rgba(196,181,253,0.8)" }}
+        >
+          My Journey
+        </span>
+      </div>
 
+      {/* Title */}
       <div className="overflow-hidden">
         <h2
-          className="text-4xl md:text-5xl font-black text-white"
+          className="text-4xl md:text-5xl font-black uppercase"
           style={{
+            background: "linear-gradient(135deg, #fff 30%, rgba(196,181,253,0.7) 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            letterSpacing: "-0.03em",
             opacity: v ? 1 : 0,
             transform: v ? "translateY(0)" : "translateY(48px)",
             transition: "opacity 0.7s ease 0.2s, transform 0.7s cubic-bezier(0.22,1,0.36,1) 0.2s",
@@ -447,12 +460,13 @@ function SectionHeader() {
         </h2>
       </div>
 
-      {/* Expanding accent line */}
+      {/* Expanding accent line — same as Hero's divider */}
       <div className="flex justify-center my-4">
         <div
           className="h-px"
           style={{
-            background: "linear-gradient(90deg, transparent, #7c3aed, #a78bfa, #7c3aed, transparent)",
+            background:
+              "linear-gradient(90deg, transparent, #7c3aed, #a78bfa, #7c3aed, transparent)",
             width: v ? "220px" : "0px",
             transition: "width 1.1s cubic-bezier(0.22,1,0.36,1) 0.4s",
           }}
@@ -460,8 +474,12 @@ function SectionHeader() {
       </div>
 
       <p
-        className="max-w-xl mx-auto text-slate-400 text-sm"
-        style={{ opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.5s" }}
+        className="max-w-xl mx-auto text-sm"
+        style={{
+          color: "rgba(148,163,184,0.75)",
+          opacity: v ? 1 : 0,
+          transition: "opacity 0.6s ease 0.5s",
+        }}
       >
         Real-world projects and roles that shaped my skills as a full-stack developer.
       </p>
@@ -471,24 +489,108 @@ function SectionHeader() {
 
 /* ─── Main export ─── */
 export default function Experience() {
+  const sectionRef = useRef(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouse = (e) => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      setMousePos({
+        x: ((e.clientX - rect.left) / rect.width - 0.5) * 20,
+        y: ((e.clientY - rect.top) / rect.height - 0.5) * 20,
+      });
+    };
+    window.addEventListener("mousemove", handleMouse);
+    return () => window.removeEventListener("mousemove", handleMouse);
+  }, []);
+
   return (
     <>
       <style>{`
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
       `}</style>
 
-      <section id="experience" className="relative py-28 bg-slate-950 overflow-hidden">
-        {/* Ambient glows */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-violet-800/8 blur-[180px]" />
-          <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-blue-700/8 blur-[180px]" />
+      <section
+        id="experience"
+        ref={sectionRef}
+        className="relative py-28 bg-[#050816] text-white overflow-hidden"
+      >
+        {/* Connected particle canvas */}
+        <ParticleCanvas />
+
+        {/* Ambient glows with mouse parallax */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div
+            className="absolute w-[700px] h-[700px] rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(109,40,217,0.18) 0%, transparent 70%)",
+              top: "-10%",
+              left: "-5%",
+              transform: `translate(${mousePos.x * 0.5}px, ${mousePos.y * 0.5}px)`,
+              transition: "transform 0.4s ease-out",
+            }}
+          />
+          <div
+            className="absolute w-[600px] h-[600px] rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%)",
+              bottom: "-10%",
+              right: "-5%",
+              transform: `translate(${mousePos.x * -0.4}px, ${mousePos.y * -0.4}px)`,
+              transition: "transform 0.4s ease-out",
+            }}
+          />
+          <div
+            className="absolute w-[400px] h-[400px] rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 70%)",
+              top: "40%",
+              left: "40%",
+            }}
+          />
         </div>
 
-        <Particles />
+        {/* Noise texture overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+            backgroundSize: "128px",
+          }}
+        />
 
+        {/* Decorative grid lines */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(139,92,246,0.04) 1px, transparent 1px)
+            `,
+            backgroundSize: "60px 60px",
+          }}
+        />
+
+        {/* Watermark */}
+        <div
+          className="absolute select-none pointer-events-none whitespace-nowrap font-black uppercase"
+          style={{
+            fontSize: "clamp(6rem, 18vw, 18rem)",
+            color: "rgba(255,255,255,0.018)",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          EXPERIENCE
+        </div>
+
+        {/* Content */}
         <div className="relative z-10 max-w-4xl mx-auto px-6">
           <SectionHeader />
-
           <div className="space-y-10">
             {experiences.map((exp, i) => (
               <ExpCard key={i} exp={exp} i={i} />

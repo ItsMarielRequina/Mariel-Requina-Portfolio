@@ -53,46 +53,74 @@ const contactInfo = [
   },
 ];
 
-// ─── Starfield Canvas ────────────────────────────────────────────────────────
+// ─── Particle Canvas (matching Hero exactly) ─────────────────────────────────
 
-function Stars() {
-  const ref = useRef(null);
+function ParticleCanvas() {
+  const canvasRef = useRef(null);
+
   useEffect(() => {
-    const c = ref.current;
-    if (!c) return;
-    const ctx = c.getContext("2d");
-    const resize = () => { c.width = window.innerWidth; c.height = window.innerHeight; };
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    let animId;
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
     resize();
     window.addEventListener("resize", resize);
-    const stars = Array.from({ length: 80 }, () => ({
-      x: Math.random(), y: Math.random(),
-      r: Math.random() * 1.2 + 0.2,
-      a: Math.random() * 0.5 + 0.1,
-      phase: Math.random() * Math.PI * 2,
+
+    const particles = Array.from({ length: 60 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.3,
+      dx: (Math.random() - 0.5) * 0.3,
+      dy: (Math.random() - 0.5) * 0.3,
+      alpha: Math.random() * 0.5 + 0.1,
     }));
-    let t = 0, raf;
+
     const draw = () => {
-      ctx.clearRect(0, 0, c.width, c.height);
-      t += 0.016;
-      stars.forEach(s => {
-        const alpha = s.a * (0.7 + 0.3 * Math.sin(t * 2 + s.phase));
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p) => {
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
         ctx.beginPath();
-        ctx.arc(s.x * c.width, s.y * c.height, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(167,139,250,${alpha})`;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(167,139,250,${p.alpha})`;
         ctx.fill();
       });
-      raf = requestAnimationFrame(draw);
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dist = Math.hypot(
+            particles[i].x - particles[j].x,
+            particles[i].y - particles[j].y
+          );
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(139,92,246,${0.15 * (1 - dist / 100)})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      animId = requestAnimationFrame(draw);
     };
     draw();
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+    };
   }, []);
+
   return (
     <canvas
-      ref={ref}
-      style={{
-        position: "fixed", inset: 0, zIndex: 0,
-        opacity: 0.6, pointerEvents: "none",
-      }}
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none"
     />
   );
 }
@@ -142,13 +170,14 @@ function ContactInfoCard({ item, i }) {
         position: "relative", overflow: "hidden",
         display: "flex", alignItems: "center", gap: "14px",
         padding: "14px 16px", borderRadius: "18px",
-        border: `1px solid ${hovered ? `rgba(${item.accent},0.45)` : "rgba(255,255,255,0.08)"}`,
+        border: `1px solid ${hovered ? `rgba(${item.accent},0.45)` : "rgba(255,255,255,0.07)"}`,
         background: hovered
           ? `rgba(${item.accent},0.07)`
-          : "rgba(255,255,255,0.04)",
+          : "rgba(255,255,255,0.03)",
+        backdropFilter: "blur(20px)",
         boxShadow: hovered
           ? `0 8px 32px rgba(0,0,0,0.4), 0 0 30px rgba(${item.accent},0.15)`
-          : "none",
+          : "0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
         cursor: item.href ? "pointer" : "default",
         textDecoration: "none", color: "inherit",
         willChange: "transform",
@@ -164,7 +193,7 @@ function ContactInfoCard({ item, i }) {
         background: `radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(${item.accent},0.12), transparent 65%)`,
         opacity: hovered ? 1 : 0, transition: "opacity 0.3s",
       }} />
-      {/* Top shimmer */}
+      {/* Top shimmer — matches Hero divider style */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, height: "1px",
         background: `linear-gradient(90deg, transparent, rgba(${item.accent},0.8), transparent)`,
@@ -188,7 +217,7 @@ function ContactInfoCard({ item, i }) {
       {/* Text */}
       <div style={{ position: "relative", zIndex: 1 }}>
         <p style={{
-          color: "#64748b", fontSize: "10px", fontWeight: 700,
+          color: "rgba(100,116,139,0.8)", fontSize: "10px", fontWeight: 700,
           letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "3px",
         }}>
           {item.label}
@@ -249,7 +278,6 @@ function AnimatedInput({ label, name, type = "text", value, onChange, required, 
 
   return (
     <div style={{ position: "relative" }}>
-      {/* Floating label */}
       <label style={{
         position: "absolute",
         left: "15px",
@@ -258,8 +286,8 @@ function AnimatedInput({ label, name, type = "text", value, onChange, required, 
         fontWeight: 700,
         letterSpacing: floated ? "0.1em" : "0",
         textTransform: floated ? "uppercase" : "none",
-        color: isFocused ? "rgba(124,58,237,0.9)" : "#64748b",
-        background: floated ? "#0f0f23" : "transparent",
+        color: isFocused ? "rgba(196,181,253,0.9)" : "rgba(100,116,139,0.8)",
+        background: floated ? "#050816" : "transparent",
         padding: floated ? "0 4px" : "0",
         borderRadius: "4px",
         pointerEvents: "none",
@@ -269,7 +297,7 @@ function AnimatedInput({ label, name, type = "text", value, onChange, required, 
         {label}
       </label>
 
-      {/* Bottom accent bar */}
+      {/* Bottom accent bar — matches Hero's gradient divider */}
       <div style={{
         position: "absolute", bottom: "1px", left: "14px", right: "14px", height: "2px",
         background: "linear-gradient(90deg, #7c3aed, #a78bfa)",
@@ -297,7 +325,7 @@ function SendSuccess({ visible }) {
       position: "absolute", inset: 0, borderRadius: "inherit",
       display: "flex", flexDirection: "column", alignItems: "center",
       justifyContent: "center", gap: "14px", zIndex: 20,
-      background: "linear-gradient(160deg, rgba(9,7,30,0.97), rgba(13,10,40,0.97))",
+      background: "linear-gradient(160deg, rgba(5,8,22,0.97), rgba(5,8,22,0.97))",
       backdropFilter: "blur(6px)",
       opacity: visible ? 1 : 0,
       pointerEvents: visible ? "all" : "none",
@@ -305,25 +333,24 @@ function SendSuccess({ visible }) {
     }}>
       <div style={{
         width: "64px", height: "64px", borderRadius: "50%",
-        background: "linear-gradient(135deg, rgba(124,58,237,0.3), rgba(6,182,212,0.15))",
+        background: "linear-gradient(135deg, rgba(124,58,237,0.3), rgba(167,139,250,0.15))",
         border: "1px solid rgba(124,58,237,0.45)",
         display: "flex", alignItems: "center", justifyContent: "center",
-        boxShadow: "0 0 50px rgba(124,58,237,0.4), 0 0 80px rgba(6,182,212,0.2)",
+        boxShadow: "0 0 50px rgba(124,58,237,0.4), 0 0 80px rgba(167,139,250,0.2)",
         animation: visible ? "pop-in 0.5s cubic-bezier(0.22,1,0.36,1)" : "none",
       }}>
         <svg width="28" height="28" fill="none" stroke="#a78bfa" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
         </svg>
       </div>
-      <p style={{ color: "#f8fafc", fontWeight: 700, fontSize: "17px", margin: 0 }}>
+      <p style={{ color: "#fff", fontWeight: 800, fontSize: "17px", margin: 0 }}>
         Message sent!
       </p>
-      <p style={{ color: "#64748b", fontSize: "13px", margin: 0 }}>
+      <p style={{ color: "rgba(148,163,184,0.75)", fontSize: "13px", margin: 0 }}>
         I'll get back to you soon.
       </p>
-      {/* Confetti dots */}
       <div style={{ display: "flex", gap: "6px", marginTop: "4px" }}>
-        {["#a78bfa", "#06b6d4", "#ec4899"].map((color, i) => (
+        {["#a78bfa", "#818cf8", "#c4b5fd"].map((color, i) => (
           <div key={i} style={{
             width: "6px", height: "6px", borderRadius: "50%", background: color,
             animation: `float-up 0.6s ${i * 0.1}s both`,
@@ -351,21 +378,41 @@ function SectionHeader() {
 
   return (
     <div ref={ref} style={{ textAlign: "center", marginBottom: "64px" }}>
-      <p style={{
-        fontSize: "11px", fontWeight: 700, letterSpacing: "0.25em",
-        textTransform: "uppercase", color: "#8b5cf6",
-        marginBottom: "12px",
+      {/* Eyebrow — matches Hero badge style */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+        marginBottom: "16px",
         opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.1s",
       }}>
-        Let's Talk
-      </p>
+        <div style={{
+          height: "1px", width: "32px", borderRadius: "999px",
+          background: "linear-gradient(90deg, transparent, #7c3aed)",
+        }} />
+        <p style={{
+          fontSize: "11px", fontWeight: 700, letterSpacing: "0.35em",
+          textTransform: "uppercase", color: "rgba(196,181,253,0.8)", margin: 0,
+        }}>
+          Let's Talk
+        </p>
+        <div style={{
+          height: "1px", width: "32px", borderRadius: "999px",
+          background: "linear-gradient(90deg, #7c3aed, transparent)",
+        }} />
+      </div>
 
+      {/* Title — matches Hero h1 gradient */}
       <div style={{ overflow: "hidden" }}>
         <h2 style={{
-          fontSize: "clamp(36px, 5vw, 58px)", fontWeight: 800, lineHeight: 1.1,
-          background: "linear-gradient(135deg, #fff 0%, #a78bfa 50%, #06b6d4 100%)",
-          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          backgroundClip: "text", marginBottom: "16px",
+          fontSize: "clamp(2.5rem, 6vw, 4rem)",
+          fontWeight: 900,
+          lineHeight: 1.1,
+          letterSpacing: "-0.03em",
+          textTransform: "uppercase",
+          background: "linear-gradient(135deg, #fff 30%, rgba(196,181,253,0.7) 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
+          marginBottom: "0",
           opacity: v ? 1 : 0,
           transform: v ? "translateY(0)" : "translateY(50px)",
           transition: "opacity 0.7s ease 0.2s, transform 0.7s cubic-bezier(0.22,1,0.36,1) 0.2s",
@@ -374,18 +421,19 @@ function SectionHeader() {
         </h2>
       </div>
 
+      {/* Animated divider — matches Hero */}
       <div style={{ display: "flex", justifyContent: "center", margin: "14px 0" }}>
         <div style={{
           height: "1px",
-          background: "linear-gradient(90deg, transparent, #7c3aed, #a78bfa, #06b6d4, transparent)",
-          width: v ? "240px" : "0px",
-          transition: "width 1.2s cubic-bezier(0.22,1,0.36,1) 0.4s",
+          background: "linear-gradient(90deg, transparent, #7c3aed, #a78bfa, #7c3aed, transparent)",
+          width: v ? "200px" : "0px",
+          transition: "width 1.1s cubic-bezier(0.22,1,0.36,1) 0.4s",
         }} />
       </div>
 
       <p style={{
         maxWidth: "400px", margin: "0 auto",
-        color: "#64748b", fontSize: "14px", lineHeight: 1.7,
+        color: "rgba(148,163,184,0.75)", fontSize: "14px", lineHeight: 1.7,
         opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.5s",
       }}>
         Whether it's a project, collaboration, or just a hello — my inbox is always open.
@@ -416,7 +464,6 @@ export default function Contact() {
         { threshold: 0.1 }
       );
       if (r.current) obs.observe(r.current);
-      return () => obs.disconnect();
     });
   }, []);
 
@@ -458,33 +505,67 @@ export default function Contact() {
       <section
         id="contact"
         style={{
-          position: "relative", padding: "72px 32px 96px",
-          background: "#0f0f23", overflow: "hidden",
+          position: "relative",
+          padding: "112px 32px 96px",
+          background: "#050816",
+          overflow: "hidden",
         }}
       >
-        {/* ── Background orbs ── */}
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+        {/* Particle canvas — same as Hero */}
+        <ParticleCanvas />
+
+        {/* Ambient glows — mirrors Hero */}
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
+          <div style={{
+            position: "absolute", width: "700px", height: "700px", borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(109,40,217,0.18) 0%, transparent 70%)",
+            top: "-10%", left: "-5%",
+          }} />
           <div style={{
             position: "absolute", width: "600px", height: "600px", borderRadius: "50%",
-            background: "radial-gradient(circle, #7c3aed, transparent)",
-            filter: "blur(90px)", opacity: 0.18,
-            top: "-100px", left: "-100px",
+            background: "radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%)",
+            bottom: "-10%", right: "-5%",
           }} />
           <div style={{
-            position: "absolute", width: "500px", height: "500px", borderRadius: "50%",
-            background: "radial-gradient(circle, #06b6d4, transparent)",
-            filter: "blur(90px)", opacity: 0.18,
-            bottom: "-80px", right: "-80px",
-          }} />
-          <div style={{
-            position: "absolute", width: "300px", height: "300px", borderRadius: "50%",
-            background: "radial-gradient(circle, #ec4899, transparent)",
-            filter: "blur(90px)", opacity: 0.14,
-            top: "40%", left: "55%",
+            position: "absolute", width: "400px", height: "400px", borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 70%)",
+            top: "40%", left: "40%",
           }} />
         </div>
 
-        <Stars />
+        {/* Noise texture — same as Hero */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none", opacity: 0.03,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "repeat", backgroundSize: "128px",
+        }} />
+
+        {/* Grid overlay — same as Hero */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          backgroundImage: `
+            linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(139,92,246,0.04) 1px, transparent 1px)
+          `,
+          backgroundSize: "60px 60px",
+        }} />
+
+        {/* Watermark — section-specific */}
+        <div style={{
+          position: "absolute",
+          fontSize: "clamp(5rem, 16vw, 16rem)",
+          color: "rgba(255,255,255,0.018)",
+          top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)",
+          letterSpacing: "-0.02em",
+          fontWeight: 900,
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+          pointerEvents: "none",
+          userSelect: "none",
+        }}>
+          CONTACT
+        </div>
 
         <div style={{ position: "relative", zIndex: 1, maxWidth: "1140px", margin: "0 auto" }}>
           <SectionHeader />
@@ -506,19 +587,20 @@ export default function Contact() {
                 transition: "opacity 0.8s ease 0.1s, transform 0.8s cubic-bezier(0.22,1,0.36,1) 0.1s",
               }}
             >
-              {/* Availability banner */}
+              {/* Availability banner — matches Hero's "Available for opportunities" badge */}
               <div style={{
                 position: "relative", overflow: "hidden",
                 borderRadius: "22px", padding: "22px 24px",
-                background: "linear-gradient(135deg, rgba(109,40,217,0.28), rgba(6,182,212,0.1))",
-                border: "1px solid rgba(109,40,217,0.35)",
-                boxShadow: "0 0 50px rgba(124,58,237,0.1)",
+                background: "rgba(255,255,255,0.03)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(139,92,246,0.3)",
+                boxShadow: "0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
                 marginBottom: "4px",
               }}>
                 {/* Top shimmer */}
                 <div style={{
                   position: "absolute", top: 0, left: 0, right: 0, height: "1px",
-                  background: "linear-gradient(90deg, transparent, rgba(167,139,250,0.9), rgba(6,182,212,0.7), transparent)",
+                  background: "linear-gradient(90deg, transparent, rgba(139,92,246,0.9), rgba(167,139,250,0.6), transparent)",
                 }} />
                 {/* Corner glow */}
                 <div style={{
@@ -530,27 +612,32 @@ export default function Contact() {
 
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
                   <div>
-                    <p style={{ color: "#f8fafc", fontWeight: 700, fontSize: "16px", marginBottom: "6px" }}>
-                      Open to opportunities
-                    </p>
-                    <p style={{ color: "#94a3b8", fontSize: "12px", lineHeight: 1.6, maxWidth: "240px", margin: 0 }}>
+                    {/* Ping dot — taken directly from Hero badge */}
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                      <div style={{ position: "relative", display: "flex", height: "10px", width: "10px" }}>
+                        <span style={{
+                          position: "absolute", display: "inline-flex",
+                          height: "100%", width: "100%", borderRadius: "50%",
+                          background: "rgba(167,139,250,0.75)",
+                          animation: "ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite",
+                        }} />
+                        <span style={{
+                          position: "relative", display: "inline-flex",
+                          borderRadius: "50%", height: "10px", width: "10px",
+                          background: "#8b5cf6",
+                        }} />
+                      </div>
+                      <span style={{
+                        fontSize: "10px", fontWeight: 700,
+                        letterSpacing: "0.35em", textTransform: "uppercase",
+                        color: "rgba(196,181,253,0.8)",
+                      }}>
+                        Available for opportunities
+                      </span>
+                    </div>
+                    <p style={{ color: "rgba(148,163,184,0.75)", fontSize: "12px", lineHeight: 1.6, maxWidth: "240px", margin: 0 }}>
                       Available for freelance work and full-time web development roles.
                     </p>
-                  </div>
-                  <div style={{
-                    display: "flex", flexDirection: "column", alignItems: "center",
-                    gap: "5px", flexShrink: 0, marginLeft: "20px",
-                  }}>
-                    <span style={{
-                      width: "13px", height: "13px", borderRadius: "50%",
-                      background: "#4ade80", display: "block",
-                      animation: "pulse-ring 2s ease-in-out infinite",
-                    }} />
-                    <span style={{
-                      color: "#4ade80", fontSize: "9px", fontWeight: 800, letterSpacing: "0.12em",
-                    }}>
-                      ACTIVE
-                    </span>
                   </div>
                 </div>
               </div>
@@ -560,19 +647,21 @@ export default function Contact() {
                 <ContactInfoCard key={item.label} item={item} i={i} />
               ))}
 
-              {/* Response time */}
+              {/* Response time — styled as a stat card matching Hero's stats */}
               <div style={{
                 display: "flex", alignItems: "center", gap: "8px",
-                padding: "10px 16px", borderRadius: "12px",
-                background: "rgba(6,182,212,0.07)",
-                border: "1px solid rgba(6,182,212,0.2)",
+                padding: "12px 16px", borderRadius: "16px",
+                background: "rgba(255,255,255,0.03)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
                 marginTop: "4px",
               }}>
-                <svg width="14" height="14" fill="none" stroke="#06b6d4" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span style={{ fontSize: "12px", color: "#67e8f9", fontWeight: 600 }}>
+                <div style={{
+                  width: "6px", height: "6px", borderRadius: "50%",
+                  background: "rgba(139,92,246,0.8)", flexShrink: 0,
+                }} />
+                <span style={{ fontSize: "12px", color: "rgba(196,181,253,0.7)", fontWeight: 600 }}>
                   Usually responds within 24 hours
                 </span>
               </div>
@@ -584,18 +673,19 @@ export default function Contact() {
               style={{
                 position: "relative", overflow: "hidden",
                 borderRadius: "28px", padding: "36px",
-                background: "linear-gradient(155deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018))",
-                border: "1px solid rgba(255,255,255,0.09)",
-                boxShadow: "0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07)",
+                background: "rgba(255,255,255,0.03)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.07)",
+                boxShadow: "0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)",
                 opacity: rightV ? 1 : 0,
                 transform: rightV ? "translateX(0)" : "translateX(40px)",
                 transition: "opacity 0.8s ease 0.25s, transform 0.8s cubic-bezier(0.22,1,0.36,1) 0.25s",
               }}
             >
-              {/* Top shimmer */}
+              {/* Top shimmer — matches Hero divider */}
               <div style={{
                 position: "absolute", top: 0, left: 0, right: 0, height: "1px",
-                background: "linear-gradient(90deg, transparent, rgba(124,58,237,0.9), rgba(167,139,250,0.6), rgba(6,182,212,0.5), transparent)",
+                background: "linear-gradient(90deg, transparent, rgba(124,58,237,0.9), rgba(167,139,250,0.6), transparent)",
               }} />
               {/* Corner glow */}
               <div style={{
@@ -608,14 +698,18 @@ export default function Contact() {
               <SendSuccess visible={sent} />
 
               <div style={{ position: "relative", zIndex: 1 }}>
-                <h3 style={{ color: "#f8fafc", fontWeight: 700, fontSize: "19px", marginBottom: "28px" }}>
+                <h3 style={{
+                  fontWeight: 700, fontSize: "19px", marginBottom: "28px",
+                  background: "linear-gradient(135deg, #fff 30%, rgba(196,181,253,0.7) 100%)",
+                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}>
                   Send a message
                 </h3>
 
                 <form onSubmit={handleSubmit}>
                   <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
 
-                    {/* Name + Email row */}
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
                       <AnimatedInput
                         label="Your name" name="name" value={form.name}
@@ -633,7 +727,6 @@ export default function Contact() {
                       />
                     </div>
 
-                    {/* Subject */}
                     <AnimatedInput
                       label="Subject" name="subject" value={form.subject}
                       onChange={handleChange}
@@ -642,7 +735,6 @@ export default function Contact() {
                       onBlur={() => setFocused(null)}
                     />
 
-                    {/* Message */}
                     <AnimatedInput
                       label="Message" name="message" multiline rows={6}
                       value={form.message} onChange={handleChange} required
@@ -651,7 +743,7 @@ export default function Contact() {
                       onBlur={() => setFocused(null)}
                     />
 
-                    {/* Submit button */}
+                    {/* Submit — matches Hero's primary CTA button */}
                     <button
                       type="submit"
                       disabled={sending}
@@ -662,16 +754,14 @@ export default function Contact() {
                         borderRadius: "14px",
                         background: sending
                           ? "linear-gradient(135deg, rgba(124,58,237,0.6), rgba(109,40,217,0.6))"
-                          : btnHover
-                          ? "linear-gradient(135deg, #8b5cf6, #7c3aed)"
-                          : "linear-gradient(135deg, #7c3aed, #6d28d9)",
+                          : "linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)",
                         color: "white", fontSize: "14px", fontWeight: 700,
                         cursor: sending ? "not-allowed" : "pointer",
                         display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
                         boxShadow: btnHover && !sending
-                          ? "0 0 40px rgba(124,58,237,0.5), 0 4px 20px rgba(0,0,0,0.3)"
-                          : "0 0 24px rgba(124,58,237,0.3)",
-                        transform: btnHover && !sending ? "scale(1.01)" : "scale(1)",
+                          ? "0 0 36px rgba(124,58,237,0.65)"
+                          : "0 0 24px rgba(124,58,237,0.4)",
+                        transform: btnHover && !sending ? "translateY(-1px)" : "translateY(0)",
                         transition: "all 0.25s",
                         letterSpacing: "0.03em",
                         position: "relative", overflow: "hidden",
@@ -701,7 +791,7 @@ export default function Contact() {
                       )}
                     </button>
 
-                    <p style={{ color: "#475569", fontSize: "11px", textAlign: "center", lineHeight: 1.5 }}>
+                    <p style={{ color: "rgba(100,116,139,0.6)", fontSize: "11px", textAlign: "center", lineHeight: 1.5 }}>
                       Your message is private and will only be seen by me.
                     </p>
 
@@ -712,6 +802,13 @@ export default function Contact() {
 
           </div>
         </div>
+
+        {/* Ping keyframe */}
+        <style>{`
+          @keyframes ping {
+            75%, 100% { transform: scale(2); opacity: 0; }
+          }
+        `}</style>
       </section>
     </>
   );
