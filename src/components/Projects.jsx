@@ -2,20 +2,20 @@ import { useEffect, useRef, useState, useCallback } from "react";
 
 const projects = [
   {
-    title: "DSWD Purchase Request Tracking System",
+    title: "Procurement Management System for Pantawid Pamilyang Pilipino Program (4Ps)",
     description:
-      "A full-featured procurement management system for the Department of Social Welfare and Development. Multi-stage document workflows, role-based access for 6 roles, and approval chains from End User to RD.",
-    stack: ["Laravel", "PHP", "MySQL", "Blade", "Bootstrap", "OpenSpout"],
+      "A full-featured Procurement Management System developed for the Department of Social Welfare and Development (DSWD). Features include multi-stage document workflows, role-based access for six distinct roles, and approval chains progressing from End User to Regional Director (RD). Built collaboratively by a team of eight members, ensuring robust functionality, compliance, and scalability.",
+    stack: ["Laravel", "PHP", "MySQL"],
     highlights: ["6 user roles", "Multi-stage workflows", "Excel export", "Document uploads"],
-    emoji: "🏛️",
+    logo: "https://1000logos.net/wp-content/uploads/2019/03/DSWD-Logo.png",
     accent: "#7c3aed",
     accentRgb: "124,58,237",
     tag: "Internship",
     year: "2026",
     images: [
-      "https://placehold.co/800x500/1e1b4b/a78bfa?text=Dashboard",
-      "https://placehold.co/800x500/1e1b4b/a78bfa?text=Purchase+Request",
-      "https://placehold.co/800x500/1e1b4b/a78bfa?text=Approval+Flow",
+      "./src/assets/dswd1.png",
+      "./src/assets/dswd2.png",
+      "./src/assets/dswd3.png",
     ],
   },
   {
@@ -24,33 +24,38 @@ const projects = [
       "A Vite + React point-of-sale and inventory management system for a food business. Features role-based admin/staff flows, sales recording, daily inventory tracking, and a brand-aligned UI.",
     stack: ["React", "Vite", "Tailwind CSS", "JavaScript"],
     highlights: ["Role-based access", "Sales recording", "Inventory tracking", "Brand UI"],
-    emoji: "🍗",
+    logo: "./src/assets/cknlogo.jpg",
     accent: "#6366f1",
     accentRgb: "99,102,241",
     tag: "Freelance",
     year: "2026",
     images: [
-      "https://placehold.co/800x500/1e1b4b/a78bfa?text=POS+Screen",
-      "https://placehold.co/800x500/1e1b4b/a78bfa?text=Inventory",
-      "https://placehold.co/800x500/1e1b4b/a78bfa?text=Dashboard",
+      "./src/assets/ckn1.png",
+      "./src/assets/ckn2.png",
+      "./src/assets/ckn3.png",
     ],
   },
   {
-    title: "Inventory Tracking System",
-    description:
-      "A PHP/MySQL inventory system with admin and staff roles, bcrypt authentication, and session management. Deployed on InfinityFree for live access.",
-    stack: ["PHP", "MySQL", "Bootstrap", "XAMPP"],
-    highlights: ["Admin & staff roles", "Bcrypt auth", "Live deployment", "Session management"],
-    emoji: "📦",
-    accent: "#8b5cf6",
-    accentRgb: "139,92,246",
-    tag: "Project",
-    year: "2025",
-    images: [
-      "https://placehold.co/800x500/1e1b4b/a78bfa?text=Login",
-      "https://placehold.co/800x500/1e1b4b/a78bfa?text=Products",
-      "https://placehold.co/800x500/1e1b4b/a78bfa?text=Reports",
-    ],
+    title: "Moodify: An AI-based Music Recommendation System Using Facial Emotion Recognition",
+description: "Moodify is an intelligent music recommendation system that leverages Facial Emotion Recognition (FER) to analyze user expressions in real time and suggest songs that match or enhance their emotional state. Designed to create personalized, emotion-driven listening experiences, it integrates AI/ML models with a sleek user interface for seamless interaction.",
+stack: ["Expo", "React Native", "TypeScript", "Firebase", "Machine Learning", "YOLOv8", "API Integration"],
+highlights: [
+  "AI-powered Facial Emotion Recognition",
+  "Personalized music recommendations",
+  "Real-time emotion analysis",
+  "Integration of ML models with mobile UI",
+  "Capstone project showcasing applied AI/ML"
+],
+emoji: "📦",
+accent: "#8b5cf6",
+accentRgb: "139,92,246",
+tag: "Project",
+year: "2025",
+images: [
+  "https://placehold.co/800x500/1e1b4b/a78bfa?text=Login",
+  "https://placehold.co/800x500/1e1b4b/a78bfa?text=Products",
+  "https://placehold.co/800x500/1e1b4b/a78bfa?text=Reports"
+]
   },
   {
     title: "Personal IT Portfolio Website",
@@ -370,15 +375,21 @@ function ProjectCard({ project, i, onPreview }) {
           }}
         >
           <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
+            className="w-14 h-14 rounded-2xl flex items-center justify-center overflow-hidden flex-shrink-0"
             style={{
               background: `linear-gradient(145deg, rgba(${project.accentRgb},0.25), rgba(${project.accentRgb},0.08))`,
               border: `1px solid rgba(${project.accentRgb},0.3)`,
-              boxShadow: hovered ? `0 0 20px rgba(${project.accentRgb},0.3)` : "none",
-              transition: "box-shadow 0.3s",
             }}
           >
-            {project.emoji}
+            {project.logo ? (
+              <img
+                src={project.logo}
+                alt={project.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-3xl">{project.emoji}</span>
+            )}
           </div>
 
           <div className="flex-1 min-w-0">
