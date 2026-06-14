@@ -341,7 +341,7 @@ export default function Hero() {
                 />
               </a>
               <a
-                href="/resume.pdf"
+                href="./src/assets/resume.pdf"
                 className="group flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300"
                 style={{
                   background: "rgba(255,255,255,0.04)",
@@ -395,10 +395,9 @@ export default function Hero() {
             {/* Social icons */}
             <div className="flex items-center gap-1">
               {[
-                { icon: FiGithub, label: "GitHub", href: "#" },
-                { icon: FiLinkedin, label: "LinkedIn", href: "#" },
-                { icon: FiFacebook, label: "Facebook", href: "#" },
-                { icon: FiMail, label: "Email", href: "#" },
+                { icon: FiGithub, label: "GitHub", href: "https://github.com/ItsMarielRequina" },
+                { icon: FiLinkedin, label: "LinkedIn", href: "https://www.linkedin.com/in/marielrequina/" },
+                { icon: FiFacebook, label: "Facebook", href: "https://www.facebook.com/mariel.requina.2024" },
               ].map(({ icon: Icon, label, href }) => (
                 
                 <a
