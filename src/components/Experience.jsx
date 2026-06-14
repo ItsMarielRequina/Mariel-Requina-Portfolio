@@ -443,16 +443,17 @@ function SectionHeader() {
 
       {/* Title */}
       <div className="overflow-hidden">
-        <h2
-          className="text-4xl md:text-5xl font-black uppercase"
+      <h2
+          className="font-black uppercase"
           style={{
+            fontSize: "clamp(2.5rem, 6vw, 4rem)",
+            letterSpacing: "-0.03em",
             background: "linear-gradient(135deg, #fff 30%, rgba(196,181,253,0.7) 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
-            letterSpacing: "-0.03em",
             opacity: v ? 1 : 0,
-            transform: v ? "translateY(0)" : "translateY(48px)",
+            transform: v ? "translateY(0)" : "translateY(50px)",
             transition: "opacity 0.7s ease 0.2s, transform 0.7s cubic-bezier(0.22,1,0.36,1) 0.2s",
           }}
         >

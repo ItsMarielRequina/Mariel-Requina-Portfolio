@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
-// ─── Data ───────────────────────────────────────────────────────────────────
-
 const contactInfo = [
   {
     icon: (
@@ -11,7 +9,7 @@ const contactInfo = [
       </svg>
     ),
     label: "Email",
-    value: "youremail@gmail.com",
+    value: "marrequina82@gmail.com",
     href: "mailto:youremail@gmail.com",
     accent: "124,58,237",
   },
@@ -25,7 +23,7 @@ const contactInfo = [
       </svg>
     ),
     label: "Location",
-    value: "Cotabato City, Philippines",
+    value: "Davao City, Philippines",
     href: null,
     accent: "99,102,241",
   },
@@ -36,8 +34,8 @@ const contactInfo = [
       </svg>
     ),
     label: "LinkedIn",
-    value: "linkedin.com/in/yourprofile",
-    href: "https://linkedin.com",
+    value: "https://www.linkedin.com/in/marielrequina/",
+    href: "https://www.linkedin.com/in/marielrequina/",
     accent: "139,92,246",
   },
   {
@@ -47,14 +45,13 @@ const contactInfo = [
       </svg>
     ),
     label: "GitHub",
-    value: "github.com/yourusername",
-    href: "https://github.com",
+    value: "https://github.com/ItsMarielRequina",
+    href: "https://github.com/ItsMarielRequina",
     accent: "167,139,250",
   },
 ];
 
-// ─── Particle Canvas (matching Hero exactly) ─────────────────────────────────
-
+/* ─── Particle Canvas (matching Hero + Certifications exactly) ─── */
 function ParticleCanvas() {
   const canvasRef = useRef(null);
 
@@ -125,8 +122,7 @@ function ParticleCanvas() {
   );
 }
 
-// ─── Magnetic Info Card ──────────────────────────────────────────────────────
-
+/* ─── Magnetic Info Card ─── */
 function ContactInfoCard({ item, i }) {
   const ref = useRef(null);
   const raf = useRef(null);
@@ -171,9 +167,7 @@ function ContactInfoCard({ item, i }) {
         display: "flex", alignItems: "center", gap: "14px",
         padding: "14px 16px", borderRadius: "18px",
         border: `1px solid ${hovered ? `rgba(${item.accent},0.45)` : "rgba(255,255,255,0.07)"}`,
-        background: hovered
-          ? `rgba(${item.accent},0.07)`
-          : "rgba(255,255,255,0.03)",
+        background: hovered ? `rgba(${item.accent},0.07)` : "rgba(255,255,255,0.03)",
         backdropFilter: "blur(20px)",
         boxShadow: hovered
           ? `0 8px 32px rgba(0,0,0,0.4), 0 0 30px rgba(${item.accent},0.15)`
@@ -187,20 +181,17 @@ function ContactInfoCard({ item, i }) {
         translate: visible ? "0 0" : "-30px 0",
       }}
     >
-      {/* Mouse spotlight */}
       <div style={{
         position: "absolute", inset: 0, pointerEvents: "none", borderRadius: "inherit",
         background: `radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(${item.accent},0.12), transparent 65%)`,
         opacity: hovered ? 1 : 0, transition: "opacity 0.3s",
       }} />
-      {/* Top shimmer — matches Hero divider style */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, height: "1px",
         background: `linear-gradient(90deg, transparent, rgba(${item.accent},0.8), transparent)`,
         opacity: hovered ? 1 : 0.2, transition: "opacity 0.3s",
       }} />
 
-      {/* Icon box */}
       <div style={{
         width: "44px", height: "44px", borderRadius: "14px", flexShrink: 0,
         display: "flex", alignItems: "center", justifyContent: "center",
@@ -214,7 +205,6 @@ function ContactInfoCard({ item, i }) {
         {item.icon}
       </div>
 
-      {/* Text */}
       <div style={{ position: "relative", zIndex: 1 }}>
         <p style={{
           color: "rgba(100,116,139,0.8)", fontSize: "10px", fontWeight: 700,
@@ -227,7 +217,6 @@ function ContactInfoCard({ item, i }) {
         </p>
       </div>
 
-      {/* Arrow */}
       {item.href && (
         <div style={{
           marginLeft: "auto", position: "relative", zIndex: 1,
@@ -255,8 +244,7 @@ function ContactInfoCard({ item, i }) {
   return inner;
 }
 
-// ─── Animated Floating-Label Input ──────────────────────────────────────────
-
+/* ─── Animated Floating-Label Input ─── */
 function AnimatedInput({ label, name, type = "text", value, onChange, required, multiline, rows, focused, onFocus, onBlur }) {
   const isFocused = focused === name;
   const hasValue = value.length > 0;
@@ -297,7 +285,6 @@ function AnimatedInput({ label, name, type = "text", value, onChange, required, 
         {label}
       </label>
 
-      {/* Bottom accent bar — matches Hero's gradient divider */}
       <div style={{
         position: "absolute", bottom: "1px", left: "14px", right: "14px", height: "2px",
         background: "linear-gradient(90deg, #7c3aed, #a78bfa)",
@@ -317,8 +304,7 @@ function AnimatedInput({ label, name, type = "text", value, onChange, required, 
   );
 }
 
-// ─── Success Overlay ─────────────────────────────────────────────────────────
-
+/* ─── Success Overlay ─── */
 function SendSuccess({ visible }) {
   return (
     <div style={{
@@ -361,8 +347,7 @@ function SendSuccess({ visible }) {
   );
 }
 
-// ─── Section Header ──────────────────────────────────────────────────────────
-
+/* ─── Section Header — now matches Certifications exactly ─── */
 function SectionHeader() {
   const ref = useRef(null);
   const [v, setV] = useState(false);
@@ -377,51 +362,50 @@ function SectionHeader() {
   }, []);
 
   return (
-    <div ref={ref} style={{ textAlign: "center", marginBottom: "64px" }}>
-      {/* Eyebrow — matches Hero badge style */}
-      <div style={{
-        display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-        marginBottom: "16px",
-        opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.1s",
-      }}>
-        <div style={{
-          height: "1px", width: "32px", borderRadius: "999px",
-          background: "linear-gradient(90deg, transparent, #7c3aed)",
-        }} />
-        <p style={{
-          fontSize: "11px", fontWeight: 700, letterSpacing: "0.35em",
-          textTransform: "uppercase", color: "rgba(196,181,253,0.8)", margin: 0,
-        }}>
+    <div ref={ref} className="text-center mb-20">
+      {/* Eyebrow — matches Certifications */}
+      <div
+        className="flex items-center justify-center gap-2 mb-4"
+        style={{ opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.1s" }}
+      >
+        <div
+          className="h-px w-8 rounded-full"
+          style={{ background: "linear-gradient(90deg, transparent, #7c3aed)" }}
+        />
+        <p
+          className="uppercase tracking-[0.35em] text-xs font-medium"
+          style={{ color: "rgba(196,181,253,0.8)", margin: 0 }}
+        >
           Let's Talk
         </p>
-        <div style={{
-          height: "1px", width: "32px", borderRadius: "999px",
-          background: "linear-gradient(90deg, #7c3aed, transparent)",
-        }} />
+        <div
+          className="h-px w-8 rounded-full"
+          style={{ background: "linear-gradient(90deg, #7c3aed, transparent)" }}
+        />
       </div>
 
-      {/* Title — matches Hero h1 gradient */}
+      {/* Title — matches Certifications h2 size exactly */}
       <div style={{ overflow: "hidden" }}>
-        <h2 style={{
-          fontSize: "clamp(2.5rem, 6vw, 4rem)",
-          fontWeight: 900,
-          lineHeight: 1.1,
-          letterSpacing: "-0.03em",
-          textTransform: "uppercase",
-          background: "linear-gradient(135deg, #fff 30%, rgba(196,181,253,0.7) 100%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-          marginBottom: "0",
-          opacity: v ? 1 : 0,
-          transform: v ? "translateY(0)" : "translateY(50px)",
-          transition: "opacity 0.7s ease 0.2s, transform 0.7s cubic-bezier(0.22,1,0.36,1) 0.2s",
-        }}>
+        <h2
+          className="font-black uppercase"
+          style={{
+            fontSize: "clamp(2.5rem, 6vw, 4rem)",
+            letterSpacing: "-0.03em",
+            background: "linear-gradient(135deg, #fff 30%, rgba(196,181,253,0.7) 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            opacity: v ? 1 : 0,
+            transform: v ? "translateY(0)" : "translateY(50px)",
+            transition: "opacity 0.7s ease 0.2s, transform 0.7s cubic-bezier(0.22,1,0.36,1) 0.2s",
+            margin: 0,
+          }}
+        >
           Get in Touch
         </h2>
       </div>
 
-      {/* Animated divider — matches Hero */}
+      {/* Animated divider — matches Certifications */}
       <div style={{ display: "flex", justifyContent: "center", margin: "14px 0" }}>
         <div style={{
           height: "1px",
@@ -431,19 +415,22 @@ function SectionHeader() {
         }} />
       </div>
 
-      <p style={{
-        maxWidth: "400px", margin: "0 auto",
-        color: "rgba(148,163,184,0.75)", fontSize: "14px", lineHeight: 1.7,
-        opacity: v ? 1 : 0, transition: "opacity 0.6s ease 0.5s",
-      }}>
+      <p
+        className="max-w-xl mx-auto text-sm"
+        style={{
+          color: "rgba(148,163,184,0.75)",
+          opacity: v ? 1 : 0,
+          transition: "opacity 0.6s ease 0.5s",
+          margin: 0,
+        }}
+      >
         Whether it's a project, collaboration, or just a hello — my inbox is always open.
       </p>
     </div>
   );
 }
 
-// ─── Main Export ─────────────────────────────────────────────────────────────
-
+/* ─── Main Export ─── */
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [sent, setSent] = useState(false);
@@ -495,79 +482,81 @@ export default function Contact() {
           0%   { opacity: 0; transform: translateY(20px); }
           100% { opacity: 1; transform: translateY(0); }
         }
-        @keyframes pulse-ring {
-          0%   { box-shadow: 0 0 0 0 rgba(74,222,128,0.5); }
-          70%  { box-shadow: 0 0 0 8px rgba(74,222,128,0); }
-          100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+        @keyframes ping {
+          75%, 100% { transform: scale(2); opacity: 0; }
         }
       `}</style>
 
       <section
         id="contact"
-        style={{
-          position: "relative",
-          padding: "112px 32px 96px",
-          background: "#050816",
-          overflow: "hidden",
-        }}
+        className="relative py-28 overflow-hidden"
+        style={{ background: "#050816" }}
       >
-        {/* Particle canvas — same as Hero */}
+        {/* Particle canvas — same as Certifications */}
         <ParticleCanvas />
 
-        {/* Ambient glows — mirrors Hero */}
-        <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
-          <div style={{
-            position: "absolute", width: "700px", height: "700px", borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(109,40,217,0.18) 0%, transparent 70%)",
-            top: "-10%", left: "-5%",
-          }} />
-          <div style={{
-            position: "absolute", width: "600px", height: "600px", borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%)",
-            bottom: "-10%", right: "-5%",
-          }} />
-          <div style={{
-            position: "absolute", width: "400px", height: "400px", borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 70%)",
-            top: "40%", left: "40%",
-          }} />
+        {/* Ambient glows — mirrors Certifications glow placement */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div
+            className="absolute w-[700px] h-[700px] rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(109,40,217,0.18) 0%, transparent 70%)",
+              top: "-10%", left: "-5%",
+            }}
+          />
+          <div
+            className="absolute w-[600px] h-[600px] rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%)",
+              bottom: "-10%", right: "-5%",
+            }}
+          />
+          <div
+            className="absolute w-[400px] h-[400px] rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(236,72,153,0.1) 0%, transparent 70%)",
+              top: "40%", left: "40%",
+            }}
+          />
         </div>
 
-        {/* Noise texture — same as Hero */}
-        <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none", opacity: 0.03,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          backgroundRepeat: "repeat", backgroundSize: "128px",
-        }} />
+        {/* Noise texture — same as Certifications */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+            backgroundSize: "128px",
+          }}
+        />
 
-        {/* Grid overlay — same as Hero */}
-        <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none",
-          backgroundImage: `
-            linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(139,92,246,0.04) 1px, transparent 1px)
-          `,
-          backgroundSize: "60px 60px",
-        }} />
+        {/* Grid overlay — same as Certifications */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(139,92,246,0.04) 1px, transparent 1px)
+            `,
+            backgroundSize: "60px 60px",
+          }}
+        />
 
         {/* Watermark — section-specific */}
-        <div style={{
-          position: "absolute",
-          fontSize: "clamp(5rem, 16vw, 16rem)",
-          color: "rgba(255,255,255,0.018)",
-          top: "50%", left: "50%",
-          transform: "translate(-50%, -50%)",
-          letterSpacing: "-0.02em",
-          fontWeight: 900,
-          textTransform: "uppercase",
-          whiteSpace: "nowrap",
-          pointerEvents: "none",
-          userSelect: "none",
-        }}>
+        <div
+          className="absolute select-none pointer-events-none whitespace-nowrap font-black uppercase"
+          style={{
+            fontSize: "clamp(5rem, 16vw, 16rem)",
+            color: "rgba(255,255,255,0.018)",
+            top: "50%", left: "50%",
+            transform: "translate(-50%, -50%)",
+            letterSpacing: "-0.02em",
+          }}
+        >
           CONTACT
         </div>
 
-        <div style={{ position: "relative", zIndex: 1, maxWidth: "1140px", margin: "0 auto" }}>
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
           <SectionHeader />
 
           <div style={{
@@ -587,7 +576,7 @@ export default function Contact() {
                 transition: "opacity 0.8s ease 0.1s, transform 0.8s cubic-bezier(0.22,1,0.36,1) 0.1s",
               }}
             >
-              {/* Availability banner — matches Hero's "Available for opportunities" badge */}
+              {/* Availability banner */}
               <div style={{
                 position: "relative", overflow: "hidden",
                 borderRadius: "22px", padding: "22px 24px",
@@ -597,12 +586,10 @@ export default function Contact() {
                 boxShadow: "0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
                 marginBottom: "4px",
               }}>
-                {/* Top shimmer */}
                 <div style={{
                   position: "absolute", top: 0, left: 0, right: 0, height: "1px",
                   background: "linear-gradient(90deg, transparent, rgba(139,92,246,0.9), rgba(167,139,250,0.6), transparent)",
                 }} />
-                {/* Corner glow */}
                 <div style={{
                   position: "absolute", top: 0, right: 0,
                   width: "130px", height: "130px",
@@ -612,7 +599,6 @@ export default function Contact() {
 
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
                   <div>
-                    {/* Ping dot — taken directly from Hero badge */}
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
                       <div style={{ position: "relative", display: "flex", height: "10px", width: "10px" }}>
                         <span style={{
@@ -647,7 +633,7 @@ export default function Contact() {
                 <ContactInfoCard key={item.label} item={item} i={i} />
               ))}
 
-              {/* Response time — styled as a stat card matching Hero's stats */}
+              {/* Response time */}
               <div style={{
                 display: "flex", alignItems: "center", gap: "8px",
                 padding: "12px 16px", borderRadius: "16px",
@@ -682,12 +668,10 @@ export default function Contact() {
                 transition: "opacity 0.8s ease 0.25s, transform 0.8s cubic-bezier(0.22,1,0.36,1) 0.25s",
               }}
             >
-              {/* Top shimmer — matches Hero divider */}
               <div style={{
                 position: "absolute", top: 0, left: 0, right: 0, height: "1px",
                 background: "linear-gradient(90deg, transparent, rgba(124,58,237,0.9), rgba(167,139,250,0.6), transparent)",
               }} />
-              {/* Corner glow */}
               <div style={{
                 position: "absolute", top: "-50px", right: "-50px",
                 width: "200px", height: "200px", borderRadius: "50%",
@@ -743,7 +727,7 @@ export default function Contact() {
                       onBlur={() => setFocused(null)}
                     />
 
-                    {/* Submit — matches Hero's primary CTA button */}
+                    {/* Submit button */}
                     <button
                       type="submit"
                       disabled={sending}
@@ -791,7 +775,7 @@ export default function Contact() {
                       )}
                     </button>
 
-                    <p style={{ color: "rgba(100,116,139,0.6)", fontSize: "11px", textAlign: "center", lineHeight: 1.5 }}>
+                    <p style={{ color: "rgba(100,116,139,0.6)", fontSize: "11px", textAlign: "center", lineHeight: 1.5, margin: 0 }}>
                       Your message is private and will only be seen by me.
                     </p>
 
@@ -802,13 +786,6 @@ export default function Contact() {
 
           </div>
         </div>
-
-        {/* Ping keyframe */}
-        <style>{`
-          @keyframes ping {
-            75%, 100% { transform: scale(2); opacity: 0; }
-          }
-        `}</style>
       </section>
     </>
   );
