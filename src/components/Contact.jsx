@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import emailjs from "@emailjs/browser";
 
 const contactInfo = [
   {
@@ -459,12 +460,29 @@ export default function Contact() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setSending(true);
-    setTimeout(() => {
+  
+    emailjs.send(
+      "service_85cyovl",
+      "template_p1cqva8",
+      {
+        name: form.name,       // was from_name
+        email: form.email,     // was from_email
+        title: form.subject,   // was subject
+        message: form.message,
+      },
+      "LjJzAZ6PHtyosTvjE"
+    )
+    .then(() => {
       setSending(false);
       setSent(true);
       setForm({ name: "", email: "", subject: "", message: "" });
       setTimeout(() => setSent(false), 3500);
-    }, 1300);
+    })
+    .catch((err) => {
+      setSending(false);
+      console.error("EmailJS error:", err);
+      alert("Something went wrong. Please try again.");
+    });
   };
 
   return (
