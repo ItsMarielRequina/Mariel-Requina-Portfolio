@@ -23,3 +23,7 @@ body {
   from { transform: translateX(-50%); }
   to   { transform: translateX(0); }
 }
+
+html {
+  zoom: 1.25;
+}

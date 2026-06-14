@@ -38,7 +38,7 @@ const projects = [
   {
     title: "Moodify: An AI-based Music Recommendation System Using Facial Emotion Recognition",
 description: "Moodify is an intelligent music recommendation system that leverages Facial Emotion Recognition (FER) to analyze user expressions in real time and suggest songs that match or enhance their emotional state. Designed to create personalized, emotion-driven listening experiences, it integrates AI/ML models with a sleek user interface for seamless interaction.",
-stack: ["Expo", "React Native", "TypeScript", "Firebase", "Machine Learning", "YOLOv8", "API Integration"],
+stack: ["Expo", "React Native", "TypeScript", "Machine Learning", "API Integration"],
 highlights: [
   "AI-powered Facial Emotion Recognition",
   "Personalized music recommendations",
@@ -46,33 +46,36 @@ highlights: [
   "Integration of ML models with mobile UI",
   "Capstone project showcasing applied AI/ML"
 ],
-emoji: "📦",
+logo: "./src/assets/icon.png",
 accent: "#8b5cf6",
 accentRgb: "139,92,246",
-tag: "Project",
+tag: "Capstone Project",
 year: "2025",
 images: [
-  "https://placehold.co/800x500/1e1b4b/a78bfa?text=Login",
-  "https://placehold.co/800x500/1e1b4b/a78bfa?text=Products",
-  "https://placehold.co/800x500/1e1b4b/a78bfa?text=Reports"
+  "./src/assets/mdfy.png",
 ]
   },
   {
-    title: "Personal IT Portfolio Website",
-    description:
-      "A dark cyberpunk-themed portfolio website with particle canvas, typewriter effects, and Devicons icon grids. Single-page with black and purple aesthetic.",
-    stack: ["HTML", "CSS", "JavaScript"],
-    highlights: ["Particle canvas", "Typewriter effect", "Cyberpunk theme", "Devicons"],
-    emoji: "🌐",
+    title: "Sales and Expense Tracking System for Coffee Town",
+    description: "A comprehensive point-of-sale and management system designed for Coffee Town. It streamlines daily operations by integrating product catalog management, customer records, sales tracking, and expense monitoring. The system provides intuitive navigation for transactions, supplier management, and inventory control, ensuring efficient business oversight.",
+    stack: ["PHP", "HTML", "CSS", "JavaScript", "MySQL"],
+    highlights: [
+      "Integrated POS interface for coffee shop sales",
+      "Customer records with detailed transaction history",
+      "Expense and inventory tracking modules",
+      "Supplier and transaction management features",
+      "User-friendly design with modern UI"
+    ],
+    logo: "./src/assets/cft.png",
     accent: "#a78bfa",
     accentRgb: "167,139,250",
-    tag: "Personal",
-    year: "2025",
+    tag: "IM Project",
+    year: "2024",
     images: [
-      "https://placehold.co/800x500/1e1b4b/a78bfa?text=Hero+Section",
-      "https://placehold.co/800x500/1e1b4b/a78bfa?text=Skills+Section",
-      "https://placehold.co/800x500/1e1b4b/a78bfa?text=Projects+Section",
-    ],
+      "./src/assets/cft1.png",
+      "./src/assets/cft2.png",
+      "./src/assets/cft3.png"
+    ]
   },
 ];
 
