@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import graduationImg from "../assets/graduation.jpg";
 import atWorkImg from "../assets/atwork.jpg";
-import setupImg from "../assets/setup.jpg";
+import setupImg from "../assets/setup.png";
 
 const photos = [
   { src: graduationImg, label: "Graduation Day", tag: "Achievement", likes: 248, time: "2d ago" },
