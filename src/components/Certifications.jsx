@@ -1,4 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import certImg from "../assets/cert.png";
+import cert1Img from "../assets/cert1.png";
+import cert2Img from "../assets/cert2.png";
+import cert3Img from "../assets/cert3.png";
+import cert4Img from "../assets/cert4.png";
+import cert5Img from "../assets/cert5.png";
 
 const certifications = [
   {
@@ -7,7 +13,7 @@ const certifications = [
     date: "May 25, 2026",
     description: "Successfully completed 486 hours of supervised On-the-Job Training (OJT) at DSWD Field Office XI from February 18 to May 25, 2026. Contributed to the development of the Purchase Request Tracking System Project for the Pantawid Pamilyang Pilipino Program (4Ps) in the Davao Region, applying skills in database management, system workflows, and compliance-focused software development.",
     badge: "🏆",
-    image: "./src/assets/cert.png",
+    image: "certImg",
     accent: "#7c3aed",
     accentRgb: "124,58,237",
   },
@@ -17,7 +23,7 @@ const certifications = [
     date: "April 15, 2026",
     description: "Earned certification in responsive web design principles, covering HTML, CSS, and accessibility best practices. Demonstrated ability to build adaptive layouts, mobile-first designs, and user-friendly interfaces aligned with modern web standards.",
     badge: "🏆",
-    image: "./src/assets/cert1.png",
+    image: "cert1Img",
     accent: "#7c3aed",
     accentRgb: "124,58,237",
   },
@@ -27,7 +33,7 @@ const certifications = [
     date: "April 14, 2026",
     description: "Completed certification in Full Stack Java Development, covering core Java programming, Spring framework, Hibernate, RESTful APIs, and front-end technologies. Validates ability to build, test, and deploy scalable web applications using end-to-end Java-based solutions.",
     badge: "🎖️",
-    image: "./src/assets/cert2.png",
+    image: "cert2Img",
     accent: "#6366f1",
     accentRgb: "99,102,241",
   },
@@ -37,7 +43,7 @@ const certifications = [
     date: "April 16, 2026",
     description: "Completed certification focused on developing critical thinking skills in the context of artificial intelligence. Validates the ability to analyze AI-driven challenges, evaluate ethical implications, and apply problem-solving strategies to adapt in a rapidly evolving digital era.",
     badge: "📜",
-    image: "./src/assets/cert3.png",
+    image: "cert3Img",
     accent: "#8b5cf6",
     accentRgb: "139,92,246",
   },
@@ -47,7 +53,7 @@ const certifications = [
     date: "April 14, 2026",
     description: "Completed certification course focused on the foundations of artificial intelligence. Covered key concepts such as machine learning, neural networks, natural language processing, and ethical considerations in AI. Validates ability to apply AI techniques in building intelligent systems and applications.",
     badge: "📜",
-    image: "./src/assets/cert4.png",
+    image: "cert4Img",
     accent: "#8b5cf6",
     accentRgb: "139,92,246",
   },
@@ -57,7 +63,7 @@ const certifications = [
     date: "April 14, 2026",
     description: "Completed certification in Cyber Threat Management, focusing on identifying, analyzing, and mitigating cybersecurity risks. Validates skills in threat detection, incident response, and the application of security best practices to protect networks and data against evolving cyber threats.",
     badge: "📜",
-    image: "./src/assets/cert5.png",
+    image: "cert5Img",
     accent: "#8b5cf6",
     accentRgb: "139,92,246",
   },

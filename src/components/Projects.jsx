@@ -1,4 +1,17 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import dswd1 from "../assets/dswd1.png";
+import dswd2 from "../assets/dswd2.png";
+import dswd3 from "../assets/dswd3.png";
+import cknLogo from "../assets/cknlogo.jpg";
+import ckn1 from "../assets/ckn1.png";
+import ckn2 from "../assets/ckn2.png";
+import ckn3 from "../assets/ckn3.png";
+import moodifyIcon from "../assets/icon.png";
+import mdfy from "../assets/mdfy.png";
+import cftLogo from "../assets/cft.png";
+import cft1 from "../assets/cft1.png";
+import cft2 from "../assets/cft2.png";
+import cft3 from "../assets/cft3.png";
 
 const projects = [
   {
@@ -12,11 +25,7 @@ const projects = [
     accentRgb: "124,58,237",
     tag: "Internship",
     year: "2026",
-    images: [
-      "./src/assets/dswd1.png",
-      "./src/assets/dswd2.png",
-      "./src/assets/dswd3.png",
-    ],
+    images: [dswd1, dswd2, dswd3],
   },
   {
     title: "Sisters Chick'n Love – POS & Inventory",
@@ -24,16 +33,12 @@ const projects = [
       "A Vite + React point-of-sale and inventory management system for a food business. Features role-based admin/staff flows, sales recording, daily inventory tracking, and a brand-aligned UI.",
     stack: ["React", "Vite", "Tailwind CSS", "JavaScript"],
     highlights: ["Role-based access", "Sales recording", "Inventory tracking", "Brand UI"],
-    logo: "./src/assets/cknlogo.jpg",
+    logo:  cknLogo,
     accent: "#6366f1",
     accentRgb: "99,102,241",
     tag: "Freelance",
     year: "2026",
-    images: [
-      "./src/assets/ckn1.png",
-      "./src/assets/ckn2.png",
-      "./src/assets/ckn3.png",
-    ],
+    images: [ckn1, ckn2, ckn3],
   },
   {
     title: "Moodify: An AI-based Music Recommendation System Using Facial Emotion Recognition",
@@ -46,14 +51,12 @@ highlights: [
   "Integration of ML models with mobile UI",
   "Capstone project showcasing applied AI/ML"
 ],
-logo: "./src/assets/icon.png",
+logo: moodifyIcon,
 accent: "#8b5cf6",
 accentRgb: "139,92,246",
 tag: "Capstone Project",
 year: "2025",
-images: [
-  "./src/assets/mdfy.png",
-]
+images: [mdfy],
   },
   {
     title: "Sales and Expense Tracking System for Coffee Town",
@@ -66,16 +69,12 @@ images: [
       "Supplier and transaction management features",
       "User-friendly design with modern UI"
     ],
-    logo: "./src/assets/cft.png",
+    logo: cftLogo,
     accent: "#a78bfa",
     accentRgb: "167,139,250",
     tag: "IM Project",
     year: "2024",
-    images: [
-      "./src/assets/cft1.png",
-      "./src/assets/cft2.png",
-      "./src/assets/cft3.png"
-    ]
+    images: [cft1, cft2, cft3],
   },
 ];
 

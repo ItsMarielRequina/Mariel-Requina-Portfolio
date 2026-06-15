@@ -7,6 +7,8 @@ import {
   FiArrowRight,
   FiDownload,
 } from "react-icons/fi";
+import profileImg from "../assets/profile.png";
+import resumePdf from "../assets/resume.pdf";
 
 const roles = [
   "IT Graduate",
@@ -341,7 +343,8 @@ export default function Hero() {
                 />
               </a>
               <a
-                href="./src/assets/resume.pdf"
+                href={resumePdf}
+                download
                 className="group flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300"
                 style={{
                   background: "rgba(255,255,255,0.04)",
@@ -616,7 +619,7 @@ export default function Hero() {
 
             {/* Profile image */}
             <img
-              src={new URL("../assets/profile.png", import.meta.url).href}
+              src={profileImg}              
               alt="Mariel"
               className="relative z-20"
               style={{
