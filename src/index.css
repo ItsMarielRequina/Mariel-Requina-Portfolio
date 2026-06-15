@@ -27,3 +27,6 @@ body {
 html {
   zoom: 1.25;
 }
+html {
+  scroll-behavior: smooth;
+}
